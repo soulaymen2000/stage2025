@@ -1,6 +1,6 @@
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
-
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { AuthModule } from './auth/auth-module';
@@ -9,6 +9,7 @@ import { UserModule } from './user/user-module';
 import { ServicesModule } from './services/services-module';
 import { ReservationModule } from './reservation/reservation-module';
 import { ReviewsModule } from './reviews/reviews-module';
+import { LandingModule } from './landing/landing.module';
 
 @NgModule({
   declarations: [
@@ -22,12 +23,16 @@ import { ReviewsModule } from './reviews/reviews-module';
     UserModule,
     ServicesModule,
     ReservationModule,
-    ReviewsModule
+    ReviewsModule,
+    LandingModule,
+    
+    
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
+    provideHttpClient(withFetch())
   ],
   bootstrap: [App]
 })

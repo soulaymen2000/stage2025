@@ -1,0 +1,123 @@
+.login-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #508bfc 0%, #6a82fb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.005);
+}
+
+.card-body {
+  padding: 2.5rem;
+}
+
+h3 {
+  color: #2d3a4b;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.form-outline {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #2d3a4b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.form-control:focus {
+  border-color: #508bfc;
+  box-shadow: 0 0 0 0.2rem rgba(80, 139, 252, 0.25);
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #508bfc, #3358ff);
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s ease-in-out;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #3358ff;
+}
+
+.btn-primary:disabled {
+  background-color: #aab4c3;
+  cursor: not-allowed;
+}
+
+.btn-social {
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  color: #fff;
+  width: 100%;
+  margin-bottom: 0.8rem;
+}
+
+.btn-google {
+  background-color: #dd4b39;
+}
+
+.btn-facebook {
+  background-color: #3b5998;
+}
+
+.btn-social:disabled {
+  opacity: 0.6;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+hr.my-4 {
+  border-color: #e0e0e0;
+}
+
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+  }
+
+  .btn-primary, .btn-social {
+    font-size: 0.95rem;
+    padding: 0.6rem;
+  }
+}

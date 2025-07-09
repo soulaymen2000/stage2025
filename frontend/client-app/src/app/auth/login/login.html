@@ -1,1 +1,54 @@
-<p>login works!</p>
+<section class="login-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card">
+          <div class="card-body text-center">
+            <h3>Connexion</h3>
+
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <div class="form-outline">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" formControlName="email" placeholder="Entrez votre email" />
+                <div class="error" *ngIf="email?.touched && email?.invalid">
+                  Un email valide est requis.
+                </div>
+              </div>
+
+              <div class="form-outline">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" id="password" class="form-control" formControlName="password" placeholder="Mot de passe" />
+                <div class="error" *ngIf="password?.touched && password?.invalid">
+                  Mot de passe requis.
+                </div>
+              </div>
+
+              <div class="form-check text-start mb-3">
+                <input class="form-check-input" type="checkbox" id="rememberMe" />
+                <label class="form-check-label" for="rememberMe">
+                  Se souvenir de moi
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || submitting">
+                Connexion
+              </button>
+
+              <div class="error mt-3" *ngIf="errorMsg">{{ errorMsg }}</div>
+            </form>
+
+            <hr class="my-4">
+
+            <button class="btn btn-social btn-google" type="button" disabled>
+              <i class="fab fa-google me-2"></i> Connexion avec Google
+            </button>
+
+            <button class="btn btn-social btn-facebook" type="button" disabled>
+              <i class="fab fa-facebook-f me-2"></i> Connexion avec Facebook
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

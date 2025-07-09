@@ -1,1 +1,38 @@
-<p>register works!</p>
+<div class="register-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    <h2>Créer un compte</h2>
+    <div class="form-group">
+      <label for="firstName">Prénom</label>
+      <input id="firstName" formControlName="firstName" type="text" placeholder="Votre prénom" required />
+      <div class="error" *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+        Prénom requis
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Nom</label>
+      <input id="lastName" formControlName="lastName" type="text" placeholder="Votre nom" required />
+      <div class="error" *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+        Nom requis
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" formControlName="email" type="email" placeholder="Votre email" required />
+      <div class="error" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+        Email valide requis
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <input id="password" formControlName="password" type="password" placeholder="Mot de passe" required />
+      <div class="error" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        Mot de passe requis (min. 6 caractères)
+      </div>
+    </div>
+    <button type="submit" [disabled]="registerForm.invalid">S'inscrire</button>
+    <div class="redirect-login">
+      <span>Vous avez déjà un compte ?</span>
+      <button type="button" class="link-btn" (click)="goToLogin()">Se connecter</button>
+    </div>
+  </form>
+</div>
