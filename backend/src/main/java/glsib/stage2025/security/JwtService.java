@@ -12,7 +12,8 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String SECRET = "ma-super-cle-secrete-qui-doit-etre-longue-et-secrete-2025-!@#";
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
     private final long EXPIRATION_TIME = 86400000; // 1 jour en ms
 
     public String generateToken(Authentication authentication) {
