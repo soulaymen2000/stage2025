@@ -19,6 +19,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { SharedModule } from '../shared/shared-module';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import { SharedModule } from '../shared/shared-module';
     MatMenuModule,
     MatGridListModule,
     MatProgressBarModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ]
 })
 export class ServicesModule { }

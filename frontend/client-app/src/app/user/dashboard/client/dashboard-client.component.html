@@ -2,6 +2,34 @@
 <div class="min-h-screen flex items-center justify-center bg-darkmode">
   <div class="w-full max-w-xl p-10 rounded-2xl shadow-2xl bg-[#23263b] text-center">
     <h2 class="text-2xl font-bold text-primary mb-4">Bienvenue, Client !</h2>
-    <p class="text-lg text-grey">Voici votre espace personnel.</p>
+    <p class="text-lg text-grey mb-6">Voici vos services réservés :</p>
+    <div *ngIf="loading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+    <div *ngIf="!loading && reservations.length === 0" class="text-grey text-lg">Aucune réservation trouvée.</div>
+    <div *ngIf="!loading && reservations.length > 0" class="space-y-6">
+      <div *ngFor="let reservation of reservations" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col items-start">
+        <div class="text-left w-full">
+          <h3 class="text-xl font-bold text-primary mb-2">{{ services[reservation.serviceId]?.title || 'Service inconnu' }}</h3>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Description:</span> {{ services[reservation.serviceId]?.description }}</p>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Catégorie:</span> {{ services[reservation.serviceId]?.category }}</p>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ services[reservation.serviceId]?.price }} DT</p>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Date de réservation:</span> {{ reservation.reservationDate | date:'short' }}</p>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+          <span class="text-grey font-semibold">Votre note :</span>
+          <ng-container *ngIf="reviews[reservation.serviceId]">
+            <ng-container *ngFor="let star of [1,2,3,4,5]">
+              <svg [ngClass]="{'text-yellow-400 fill-yellow-400': reviews[reservation.serviceId].rating >= star, 'text-gray-400 fill-gray-400': reviews[reservation.serviceId].rating < star}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            </ng-container>
+            <span class="ml-2 text-white text-sm">({{ reviews[reservation.serviceId].rating }}/5)</span>
+            <span *ngIf="reviews[reservation.serviceId].comment" class="ml-4 text-grey italic">"{{ reviews[reservation.serviceId].comment }}"</span>
+          </ng-container>
+          <span *ngIf="!reviews[reservation.serviceId]" class="text-grey italic">Non noté</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

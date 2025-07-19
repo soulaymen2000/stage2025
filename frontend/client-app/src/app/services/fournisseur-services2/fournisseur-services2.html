@@ -37,17 +37,47 @@
     </div>
 
     <div *ngIf="ready && services.length > 0" class="space-y-6">
-      <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between">
-        <div class="text-left mb-4 md:mb-0">
-          <h3 class="text-xl font-bold text-primary mb-2">{{ service.title }}</h3>
-          <p class="text-white mb-1"><span class="font-semibold text-grey">Description:</span> {{ service.description }}</p>
-          <p class="text-white mb-1"><span class="font-semibold text-grey">Catégorie:</span> {{ service.category }}</p>
-          <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ service.price }} DT</p>
-          <p class="text-white"><span class="font-semibold text-grey">Localisation:</span> {{ service.location }}</p>
+      <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full mb-2">
+          <div class="text-left">
+            <h3 class="text-xl font-bold text-primary mb-2">{{ service.title }}</h3>
+            <p class="text-white mb-1"><span class="font-semibold text-grey">Description:</span> {{ service.description }}</p>
+            <p class="text-white mb-1"><span class="font-semibold text-grey">Catégorie:</span> {{ service.category }}</p>
+            <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ service.price }} DT</p>
+            <p class="text-white"><span class="font-semibold text-grey">Localisation:</span> {{ service.location }}</p>
+          </div>
+          <div class="flex gap-4 mt-4 md:mt-0">
+            <button (click)="editService(service)" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Modifier</button>
+            <button (click)="deleteService(service.id)" class="bg-red-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Supprimer</button>
+            <button *ngIf="isClient" (click)="reserve(service.id!)" [disabled]="loadingReservation[service.id!] || hasReserved(service.id!)" class="bg-green-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
+              <span *ngIf="!hasReserved(service.id!) && !loadingReservation[service.id!]">Réserver</span>
+              <span *ngIf="hasReserved(service.id!)">Réservé</span>
+              <span *ngIf="loadingReservation[service.id!]">...</span>
+            </button>
+          </div>
         </div>
-        <div class="flex gap-4 justify-end">
-          <button (click)="editService(service)" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Modifier</button>
-          <button (click)="deleteService(service.id)" class="bg-red-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Supprimer</button>
+        <div *ngIf="isClient" class="rounded-lg bg-[#23263b] border border-dark_border p-6 shadow-md w-full flex flex-col gap-4 mt-2">
+          <div *ngIf="successReservation[service.id!]" class="text-green-400 text-sm mt-1">Réservation effectuée !</div>
+          <div *ngIf="errorReservation[service.id!]" class="text-red-400 text-sm mt-1">{{ errorReservation[service.id!] }}</div>
+          <!-- Rating Stars -->
+          <div class="flex flex-col md:flex-row md:items-center gap-4 w-full">
+            <div class="flex items-center gap-2">
+              <ng-container *ngFor="let star of [1,2,3,4,5]">
+                <svg (click)="setRating(service.id!, star)" [ngClass]="{'cursor-pointer': true, 'text-yellow-400 fill-yellow-400': rating[service.id!] >= star, 'text-gray-400 fill-gray-400': rating[service.id!] < star}" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+              </ng-container>
+              <span class="ml-2 text-white text-sm" *ngIf="rating[service.id!]">{{ rating[service.id!] }}/5</span>
+            </div>
+            <!-- Optional Comment -->
+            <textarea [(ngModel)]="comment[service.id!]" placeholder="Laisser un commentaire (optionnel)" class="w-full mt-2 rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm"></textarea>
+            <button (click)="submitRating(service.id!)" [disabled]="!rating[service.id!] || loadingRating[service.id!]" class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
+              <span *ngIf="!loadingRating[service.id!]">Noter</span>
+              <span *ngIf="loadingRating[service.id!]">...</span>
+            </button>
+            <div *ngIf="successRating[service.id!]" class="text-green-400 text-sm mt-1">Merci pour votre note !</div>
+            <div *ngIf="errorRating[service.id!]" class="text-red-400 text-sm mt-1">{{ errorRating[service.id!] }}</div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 <app-navbar></app-navbar>
 <div class="min-h-screen bg-darkmode py-10">
   <div class="max-w-5xl mx-auto p-8">
+    <div style="background: red; color: white; font-size: 24px; padding: 10px; text-align: center;">DEBUG LINE TEST - Debug role: {{ debugRole }} | isClient: {{ isClient }} | isFournisseur: {{ isFournisseur }}</div>
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Liste des Services</h2>
     <div *ngIf="services.length > 0; else noServices" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col justify-between">
@@ -14,8 +15,30 @@
         <div class="mt-4 flex flex-col gap-2">
           <a [routerLink]="['/services', service.id]" class="inline-block bg-primary text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Voir Détail</a>
           <ng-container *ngIf="isClient">
-            <button class="inline-block bg-green-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Réserver</button>
-            <button class="inline-block bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Noter</button>
+            <!-- Reservation Button -->
+            <button (click)="reserve(service.id)" [disabled]="loadingReservation[service.id]" class="inline-block bg-green-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">
+              <span *ngIf="!loadingReservation[service.id]">Réserver</span>
+              <span *ngIf="loadingReservation[service.id]">...</span>
+            </button>
+            <div *ngIf="successReservation[service.id]" class="text-green-400 text-sm mt-1">Réservation effectuée !</div>
+            <div *ngIf="errorReservation[service.id]" class="text-red-400 text-sm mt-1">{{ errorReservation[service.id] }}</div>
+            <!-- Rating Stars -->
+            <div class="flex items-center gap-2 mt-2">
+              <ng-container *ngFor="let star of [1,2,3,4,5]">
+                <svg (click)="setRating(service.id, star)" [ngClass]="{'cursor-pointer': true, 'text-yellow-400 fill-yellow-400': rating[service.id] >= star, 'text-gray-400 fill-gray-400': rating[service.id] < star}" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+              </ng-container>
+              <span class="ml-2 text-white text-sm" *ngIf="rating[service.id]">{{ rating[service.id] }}/5</span>
+            </div>
+            <!-- Optional Comment -->
+            <textarea [(ngModel)]="comment[service.id]" placeholder="Laisser un commentaire (optionnel)" class="w-full mt-2 rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm"></textarea>
+            <button (click)="submitRating(service.id)" [disabled]="!rating[service.id] || loadingRating[service.id]" class="inline-block bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center mt-2">
+              <span *ngIf="!loadingRating[service.id]">Noter</span>
+              <span *ngIf="loadingRating[service.id]">...</span>
+            </button>
+            <div *ngIf="successRating[service.id]" class="text-green-400 text-sm mt-1">Merci pour votre note !</div>
+            <div *ngIf="errorRating[service.id]" class="text-red-400 text-sm mt-1">{{ errorRating[service.id] }}</div>
           </ng-container>
           <ng-container *ngIf="isFournisseur">
             <!-- Optionally show edit/delete for fournisseurs here if needed -->

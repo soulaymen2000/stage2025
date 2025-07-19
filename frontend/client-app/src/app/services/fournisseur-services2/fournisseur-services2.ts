@@ -4,6 +4,8 @@ import { Service } from '../service.model';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChangeDetectorRef } from '@angular/core';
+import { ReservationApiService } from '../reservation-api.service';
+import { ReviewApiService } from '../review-api.service';
 
 @Component({
   selector: 'app-fournisseur-services',
@@ -19,8 +21,21 @@ export class FournisseurServices2Component implements OnInit {
   loading = true;
   ready = true;
   isFournisseur = false;
+  isClient = false;
+  debugRole: string = '';
+  rating: { [serviceId: string]: number } = {};
+  comment: { [serviceId: string]: string } = {};
+  loadingReservation: { [serviceId: string]: boolean } = {};
+  loadingRating: { [serviceId: string]: boolean } = {};
+  successReservation: { [serviceId: string]: boolean } = {};
+  successRating: { [serviceId: string]: boolean } = {};
+  errorReservation: { [serviceId: string]: string } = {};
+  errorRating: { [serviceId: string]: string } = {};
+  public myReservations: { [serviceId: string]: boolean } = {};
   constructor(
     private api: ServiceApiService,
+    private reservationApi: ReservationApiService,
+    private reviewApi: ReviewApiService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef
@@ -48,11 +63,17 @@ export class FournisseurServices2Component implements OnInit {
         } else if (typeof role === 'string' && role.startsWith('ROLE_')) {
           role = role.replace('ROLE_', '');
         }
+        this.debugRole = JSON.stringify(role);
         if ((Array.isArray(role) && role.includes('FOURNISSEUR')) || role === 'FOURNISSEUR') {
           this.isFournisseur = true;
+        } else if ((Array.isArray(role) && role.includes('CLIENT')) || role === 'CLIENT') {
+          this.isClient = true;
         }
+        console.log('isClient:', this.isClient, 'isFournisseur:', this.isFournisseur, 'role:', role);
       } catch (e) {
         this.isFournisseur = false;
+        this.isClient = false;
+        this.debugRole = 'error';
       }
     }
     //this.ready = false;
@@ -70,6 +91,13 @@ export class FournisseurServices2Component implements OnInit {
       }*/
   ]
     this.loadServices();
+    this.reservationApi.getMyReservations().subscribe(reservations => {
+      for (const r of reservations) {
+        if (r.serviceId) {
+          this.myReservations[r.serviceId] = true;
+        }
+      }
+    });
   }
 
   loadServices() {
@@ -155,5 +183,49 @@ export class FournisseurServices2Component implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  reserve(serviceId: string) {
+    this.loadingReservation[serviceId] = true;
+    this.successReservation[serviceId] = false;
+    this.errorReservation[serviceId] = '';
+    this.reservationApi.createReservation({ serviceId }).subscribe({
+      next: () => {
+        this.successReservation[serviceId] = true;
+        this.loadingReservation[serviceId] = false;
+      },
+      error: (err: any) => {
+        this.errorReservation[serviceId] = err.error?.message || 'Erreur lors de la réservation';
+        this.loadingReservation[serviceId] = false;
+      }
+    });
+  }
+
+  setRating(serviceId: string, value: number) {
+    this.rating[serviceId] = value;
+  }
+
+  submitRating(serviceId: string) {
+    this.loadingRating[serviceId] = true;
+    this.successRating[serviceId] = false;
+    this.errorRating[serviceId] = '';
+    this.reviewApi.createReview({
+      serviceId,
+      rating: this.rating[serviceId],
+      comment: this.comment[serviceId] || ''
+    }).subscribe({
+      next: () => {
+        this.successRating[serviceId] = true;
+        this.loadingRating[serviceId] = false;
+      },
+      error: (err: any) => {
+        this.errorRating[serviceId] = err.error?.message || 'Erreur lors de la notation';
+        this.loadingRating[serviceId] = false;
+      }
+    });
+  }
+
+  hasReserved(serviceId: string): boolean {
+    return !!this.myReservations[serviceId];
   }
 }
