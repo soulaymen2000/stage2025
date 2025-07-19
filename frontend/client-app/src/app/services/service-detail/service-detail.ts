@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './service-detail.scss'
 })
 export class ServiceDetail {
-
+  public service: any = null;
 }

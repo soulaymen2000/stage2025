@@ -48,7 +48,7 @@ export class FournisseurServices2Component implements OnInit {
           "ownerId": "fornisseur@gmail.com"
       }*/
   ]
-   this.loadServices();
+    this.loadServices();
   }
 
   loadServices() {
@@ -56,14 +56,14 @@ export class FournisseurServices2Component implements OnInit {
     this.api.getServices().subscribe(res => {
       console.log('API response:', res); // Debug log
       this.services = res;
-      this.loading = false;
+        this.loading = false;
       this.ready = true;
       this.cdr.detectChanges();
-    },
+      },
     error => {
-      this.loading = false;
+        this.loading = false;
       this.ready = true;
-      this.snackBar.open('Erreur lors du chargement des services', 'Fermer', { duration: 3000 });
+        this.snackBar.open('Erreur lors du chargement des services', 'Fermer', { duration: 3000 });
     });
   }
 

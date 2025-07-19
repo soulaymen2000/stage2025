@@ -1,67 +1,59 @@
-<!-- fournisseur-services2.html -->
-<div class="debug-panel" *ngIf="true">
-  <strong>Debug:</strong> ready = {{ ready }}<br>
-  services = {{ services | json }}
-</div>
+<app-navbar></app-navbar>
+<div class="min-h-screen bg-darkmode py-10">
+  <div class="max-w-3xl mx-auto p-8 rounded-2xl shadow-2xl bg-[#23263b]">
+    <h2 class="text-2xl font-bold text-primary mb-8 text-center">Gestion des Services</h2>
 
-<div class="container">
-  <h2>Gestion des Services</h2>
+    <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div>
+        <label class="block text-white font-semibold mb-2">Titre</label>
+        <input type="text" formControlName="title" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+      </div>
+      <div>
+        <label class="block text-white font-semibold mb-2">Catégorie</label>
+        <input type="text" formControlName="category" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-white font-semibold mb-2">Description</label>
+        <textarea formControlName="description" rows="2" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none"></textarea>
+      </div>
+      <div>
+        <label class="block text-white font-semibold mb-2">Prix</label>
+        <input type="number" formControlName="price" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+      </div>
+      <div>
+        <label class="block text-white font-semibold mb-2">Localisation</label>
+        <input type="text" formControlName="location" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+      </div>
+      <div class="md:col-span-2 flex gap-4 justify-end mt-4">
+        <button type="submit" [disabled]="loading" class="bg-primary text-white font-semibold px-8 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
+          {{ editing ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+        <button *ngIf="editing" type="button" (click)="cancelEdit()" class="bg-transparent text-red-400 border border-red-400 px-8 py-2 rounded-lg hover:bg-red-400 hover:text-white transition">Annuler</button>
+      </div>
+    </form>
 
-  <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form mat-elevation-z2">
-    <mat-form-field appearance="fill">
-      <mat-label>Titre</mat-label>
-      <input matInput formControlName="title" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="2"></textarea>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Catégorie</mat-label>
-      <input matInput formControlName="category" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Prix</mat-label>
-      <input matInput type="number" formControlName="price" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Localisation</mat-label>
-      <input matInput formControlName="location" />
-    </mat-form-field>
-
-    <div class="form-actions">
-      <button mat-raised-button color="primary" type="submit" [disabled]="loading">
-        {{ editing ? 'Enregistrer' : 'Ajouter' }}
-      </button>
-      <button *ngIf="editing" mat-stroked-button color="warn" type="button" (click)="cancelEdit()">Annuler</button>
+    <div *ngIf="loading" class="w-full flex justify-center mb-6">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
-  </form>
 
-  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <div *ngIf="ready && services.length > 0" class="space-y-6">
+      <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="text-left mb-4 md:mb-0">
+          <h3 class="text-xl font-bold text-primary mb-2">{{ service.title }}</h3>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Description:</span> {{ service.description }}</p>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Catégorie:</span> {{ service.category }}</p>
+          <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ service.price }} DT</p>
+          <p class="text-white"><span class="font-semibold text-grey">Localisation:</span> {{ service.location }}</p>
+        </div>
+        <div class="flex gap-4 justify-end">
+          <button (click)="editService(service)" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">Modifier</button>
+          <button (click)="deleteService(service.id)" class="bg-red-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">Supprimer</button>
+        </div>
+      </div>
+    </div>
 
-  <div *ngIf="ready && services.length > 0" class="service-list">
-    <mat-card *ngFor="let service of services" class="service-card mat-elevation-z4">
-      <mat-card-header>
-        <mat-card-title>{{ service.title }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p><strong>Description:</strong> {{ service.description }}</p>
-        <p><strong>Catégorie:</strong> {{ service.category }}</p>
-        <p><strong>Prix:</strong> {{ service.price }} DT</p>
-        <p><strong>Localisation:</strong> {{ service.location }}</p>
-      </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-button color="accent" (click)="editService(service)">Modifier</button>
-        <button mat-button color="warn" (click)="deleteService(service.id)">Supprimer</button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
-
-  <div *ngIf="ready && services.length === 0" class="no-services">
-    <p>Aucun service disponible.</p>
+    <div *ngIf="ready && services.length === 0" class="text-center text-grey mt-8">
+      <p>Aucun service disponible.</p>
+    </div>
   </div>
 </div>

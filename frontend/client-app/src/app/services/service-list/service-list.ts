@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './service-list.scss'
 })
 export class ServiceList {
-
+  public services: any[] = [];
 }

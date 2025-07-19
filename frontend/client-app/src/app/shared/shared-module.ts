@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Navbar } from './navbar/navbar';
 import { Footer } from './footer/footer';
 
-
-
 @NgModule({
   declarations: [
     Navbar,
@@ -12,6 +10,10 @@ import { Footer } from './footer/footer';
   ],
   imports: [
     CommonModule
+  ],
+  exports: [
+    Navbar,
+    Footer
   ]
 })
 export class SharedModule { }

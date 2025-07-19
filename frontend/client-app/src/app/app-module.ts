@@ -10,7 +10,6 @@ import { UserModule } from './user/user-module';
 import { ServicesModule } from './services/services-module';
 import { ReservationModule } from './reservation/reservation-module';
 import { ReviewsModule } from './reviews/reviews-module';
-import { LandingModule } from './landing/landing.module';
 
 
 @NgModule({
@@ -26,7 +25,6 @@ import { LandingModule } from './landing/landing.module';
     ServicesModule,
     ReservationModule,
     ReviewsModule,
-    LandingModule,
     
     
   ],
