@@ -4,11 +4,13 @@ import { DashboardClientComponent } from './dashboard/client/dashboard-client.co
 import { DashboardFournisseurComponent } from './dashboard/fournisseur/dashboard-fournisseur.component';
 import { AuthGuard } from '../shared/auth.guard';
 import { FournisseurServices2Component } from '../services/fournisseur-services2/fournisseur-services2';
+import { GererProfilComponent } from './gerer-profil/gerer-profil.component';
 
 const routes: Routes = [
   { path: 'dashboard-client', component: DashboardClientComponent, canActivate: [AuthGuard] },
   { path: 'dashboard-fournisseur', component: DashboardFournisseurComponent, canActivate: [AuthGuard] },
-  { path: 'services', component: FournisseurServices2Component, canActivate: [AuthGuard] }
+  { path: 'services', component: FournisseurServices2Component, canActivate: [AuthGuard] },
+  { path: 'profile', component: GererProfilComponent, canActivate: [AuthGuard] }
 ];
 
 @NgModule({

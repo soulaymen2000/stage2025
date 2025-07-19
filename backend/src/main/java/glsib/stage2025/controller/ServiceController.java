@@ -21,9 +21,16 @@ public class ServiceController {
     @GetMapping
     public List<Service> getAllServices() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (auth != null) ? auth.getName() : null;
-        if (userId == null) return List.of();
-        return serviceRepository.findByOwnerId(userId);
+        if (auth == null) return List.of();
+        boolean isFournisseur = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("FOURNISSEUR") || a.getAuthority().equals("ROLE_FOURNISSEUR"));
+        if (isFournisseur) {
+            String userId = auth.getName();
+            return serviceRepository.findByOwnerId(userId);
+        } else {
+            // For clients and others, return all services
+            return serviceRepository.findAll();
+        }
     }
 
     @GetMapping("/{id}")

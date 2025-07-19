@@ -3,10 +3,30 @@
     <img src="codix-logo-vector.png" alt="Logo" class="h-10 w-auto" />
     <span class="text-xl font-bold text-primary">Codix Platform</span>
   </div>
-  <nav class="flex gap-6">
-    <a routerLink="/" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Accueil</a>
-    <a routerLink="/services" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Services</a>
-    <a routerLink="/auth/login" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Se connecter</a>
-    <a routerLink="/auth/register" routerLinkActive="text-primary" class="text-primary border border-primary px-4 py-1 rounded-lg hover:bg-primary hover:text-white transition font-medium">S'inscrire</a>
+  <nav class="flex gap-6 items-center">
+    <!-- Fournisseur Navbar -->
+    <ng-container *ngIf="userRole === 'FOURNISSEUR'; else clientOrGuest">
+      <a routerLink="/user/dashboard-fournisseur" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Accueil</a>
+      <a routerLink="/user/services" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Services</a>
+      <a routerLink="/user/profile" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Gérer Profil</a>
+      <span class="text-grey ml-2">{{ userName }}</span>
+      <button (click)="logout()" class="ml-4 text-red-400 border border-red-400 px-4 py-1 rounded-lg hover:bg-red-400 hover:text-white transition font-medium">Déconnexion</button>
+    </ng-container>
+    <!-- Client Navbar or Guest -->
+    <ng-template #clientOrGuest>
+      <ng-container *ngIf="userRole === 'CLIENT'; else guestLinks">
+        <a routerLink="/user/dashboard-client" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Accueil</a>
+        <a routerLink="/services" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Services</a>
+        <a routerLink="/user/profile" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Gérer Profil</a>
+        <span class="text-grey ml-2">{{ userName }}</span>
+        <button (click)="logout()" class="ml-4 text-red-400 border border-red-400 px-4 py-1 rounded-lg hover:bg-red-400 hover:text-white transition font-medium">Déconnexion</button>
+      </ng-container>
+      <ng-template #guestLinks>
+        <a routerLink="/" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Accueil</a>
+        <a routerLink="/services" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Services</a>
+        <a routerLink="/auth/login" routerLinkActive="text-primary" class="text-white hover:text-primary transition font-medium">Se connecter</a>
+        <a routerLink="/auth/register" routerLinkActive="text-primary" class="text-primary border border-primary px-4 py-1 rounded-lg hover:bg-primary hover:text-white transition font-medium">S'inscrire</a>
+      </ng-template>
+    </ng-template>
   </nav>
 </header>

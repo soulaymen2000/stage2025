@@ -18,6 +18,7 @@ export class FournisseurServices2Component implements OnInit {
   editingId: string | null = null;
   loading = true;
   ready = true;
+  isFournisseur = false;
   constructor(
     private api: ServiceApiService,
     private fb: FormBuilder,
@@ -34,6 +35,26 @@ export class FournisseurServices2Component implements OnInit {
   }
 
   ngOnInit() {
+    // Detect role
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        let role = payload.role || payload.roles || payload.authorities;
+        if (Array.isArray(role)) {
+          if (role.length && typeof role[0] === 'object' && role[0].authority) {
+            role = role.map((r: any) => r.authority.replace('ROLE_', ''));
+          }
+        } else if (typeof role === 'string' && role.startsWith('ROLE_')) {
+          role = role.replace('ROLE_', '');
+        }
+        if ((Array.isArray(role) && role.includes('FOURNISSEUR')) || role === 'FOURNISSEUR') {
+          this.isFournisseur = true;
+        }
+      } catch (e) {
+        this.isFournisseur = false;
+      }
+    }
     //this.ready = false;
     //this.loading = false;
     this.services=[

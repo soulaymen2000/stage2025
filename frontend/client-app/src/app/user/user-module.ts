@@ -4,11 +4,13 @@ import { DashboardClientComponent } from './dashboard/client/dashboard-client.co
 import { DashboardFournisseurComponent } from './dashboard/fournisseur/dashboard-fournisseur.component';
 import { UserRoutingModule } from './user-routing-module';
 import { SharedModule } from '../shared/shared-module';
+import { GererProfilComponent } from './gerer-profil/gerer-profil.component';
 
 @NgModule({
   declarations: [
     DashboardClientComponent,
-    DashboardFournisseurComponent
+    DashboardFournisseurComponent,
+    GererProfilComponent
   ],
   imports: [
     CommonModule,

@@ -11,7 +11,16 @@
           <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ service.price }} DT</p>
           <p class="text-white"><span class="font-semibold text-grey">Localisation:</span> {{ service.location }}</p>
         </div>
-        <a [routerLink]="['/services', service.id]" class="mt-4 inline-block bg-primary text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Voir Détail</a>
+        <div class="mt-4 flex flex-col gap-2">
+          <a [routerLink]="['/services', service.id]" class="inline-block bg-primary text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Voir Détail</a>
+          <ng-container *ngIf="isClient">
+            <button class="inline-block bg-green-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Réserver</button>
+            <button class="inline-block bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition text-center">Noter</button>
+          </ng-container>
+          <ng-container *ngIf="isFournisseur">
+            <!-- Optionally show edit/delete for fournisseurs here if needed -->
+          </ng-container>
+        </div>
       </div>
     </div>
     <ng-template #noServices>
