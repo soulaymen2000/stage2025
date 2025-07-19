@@ -1,7 +1,30 @@
 <app-navbar></app-navbar>
 <div class="min-h-screen bg-darkmode py-10">
   <div class="max-w-5xl mx-auto p-8">
-    <div style="background: red; color: white; font-size: 24px; padding: 10px; text-align: center;">DEBUG LINE TEST - Debug role: {{ debugRole }} | isClient: {{ isClient }} | isFournisseur: {{ isFournisseur }}</div>
+    <form (ngSubmit)="onFilterChange()" class="mb-8 flex flex-wrap gap-4 items-end justify-center bg-[#23263b] p-6 rounded-xl shadow-md">
+      <div>
+        <label class="block text-grey text-sm mb-1">Catégorie</label>
+        <input type="text" [(ngModel)]="filter.category" name="category" (ngModelChange)="onFilterChange()" class="rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm" placeholder="Catégorie" />
+      </div>
+      <div>
+        <label class="block text-grey text-sm mb-1">Prix min</label>
+        <input type="number" [(ngModel)]="filter.minPrice" name="minPrice" (ngModelChange)="onFilterChange()" class="rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm w-24" placeholder="Min" />
+      </div>
+      <div>
+        <label class="block text-grey text-sm mb-1">Prix max</label>
+        <input type="number" [(ngModel)]="filter.maxPrice" name="maxPrice" (ngModelChange)="onFilterChange()" class="rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm w-24" placeholder="Max" />
+      </div>
+      <div>
+        <label class="block text-grey text-sm mb-1">Localisation</label>
+        <input type="text" [(ngModel)]="filter.location" name="location" (ngModelChange)="onFilterChange()" class="rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm" placeholder="Ville" />
+      </div>
+      <div>
+        <label class="block text-grey text-sm mb-1">Note min</label>
+        <input type="number" min="1" max="5" [(ngModel)]="filter.minRating" name="minRating" (ngModelChange)="onFilterChange()" class="rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm w-20" placeholder="1-5" />
+      </div>
+      <button type="button" (click)="resetFilters()" class="bg-gray-700 text-white px-4 py-2 rounded-lg ml-2 hover:bg-gray-600 transition">Réinitialiser</button>
+    </form>
+    <div *ngIf="forbiddenError" class="bg-red-600 text-white text-center p-4 rounded mb-4">{{ forbiddenError }}</div>
     <h2 class="text-3xl font-bold text-primary mb-8 text-center">Liste des Services</h2>
     <div *ngIf="services.length > 0; else noServices" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col justify-between">

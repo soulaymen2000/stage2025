@@ -5,7 +5,8 @@ import { HomeComponent } from './home.component';
 import { SharedModule } from '../shared/shared-module';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent }
+  { path: '', component: HomeComponent },
+  { path: 'services', loadChildren: () => import('../services/services-module').then(m => m.ServicesModule) }
 ];
 
 @NgModule({

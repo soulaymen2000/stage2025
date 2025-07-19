@@ -19,18 +19,41 @@ public class ServiceController {
     private ServiceRepository serviceRepository;
 
     @GetMapping
-    public List<Service> getAllServices() {
+    public List<Service> getAllServices(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) Double minRating
+    ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) return List.of();
         boolean isFournisseur = auth.getAuthorities().stream()
             .anyMatch(a -> a.getAuthority().equals("FOURNISSEUR") || a.getAuthority().equals("ROLE_FOURNISSEUR"));
+        List<Service> services;
         if (isFournisseur) {
             String userId = auth.getName();
-            return serviceRepository.findByOwnerId(userId);
+            services = serviceRepository.findByOwnerId(userId);
         } else {
-            // For clients and others, return all services
-            return serviceRepository.findAll();
+            services = serviceRepository.findAll();
         }
+        // Apply filters
+        if (category != null && !category.isEmpty()) {
+            services = services.stream().filter(s -> category.equalsIgnoreCase(s.getCategory())).toList();
+        }
+        if (location != null && !location.isEmpty()) {
+            services = services.stream().filter(s -> location.equalsIgnoreCase(s.getLocation())).toList();
+        }
+        if (minPrice != null) {
+            services = services.stream().filter(s -> s.getPrice() >= minPrice).toList();
+        }
+        if (maxPrice != null) {
+            services = services.stream().filter(s -> s.getPrice() <= maxPrice).toList();
+        }
+        if (minRating != null) {
+            services = services.stream().filter(s -> s.getRating() >= minRating).toList();
+        }
+        return services;
     }
 
     @GetMapping("/{id}")

@@ -1,7 +1,8 @@
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { tokenInterceptor } from './auth/token-interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from './auth/token-interceptor';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { AuthModule } from './auth/auth-module';
@@ -33,9 +34,13 @@ import { ReviewsModule } from './reviews/reviews-module';
     provideZonelessChangeDetection(),
     provideClientHydration(withEventReplay()),
     provideHttpClient(
-      withFetch(),
-      withInterceptors([tokenInterceptor])
-    )
+      withFetch()
+    ),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [App]
 })
