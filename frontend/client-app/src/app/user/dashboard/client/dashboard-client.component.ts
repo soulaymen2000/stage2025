@@ -15,6 +15,9 @@ export class DashboardClientComponent implements OnInit {
   services: { [id: string]: any } = {};
   reviews: { [serviceId: string]: any } = {};
   loading = true;
+  recommendations: any[] = [];
+  loadingRecommendations = true;
+  errorRecommendations: string | null = null;
 
   constructor(
     private reservationApi: ReservationApiService,
@@ -43,6 +46,20 @@ export class DashboardClientComponent implements OnInit {
         this.cdr.detectChanges();
       }
     }, () => { this.loading = false; this.cdr.detectChanges(); });
+
+    // Fetch personalized recommendations
+    this.serviceApi.getPersonalizedRecommendations().subscribe({
+      next: (recs) => {
+        this.recommendations = recs;
+        this.loadingRecommendations = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorRecommendations = 'Erreur lors du chargement des recommandations.';
+        this.loadingRecommendations = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadReviews(serviceIds: string[]) {

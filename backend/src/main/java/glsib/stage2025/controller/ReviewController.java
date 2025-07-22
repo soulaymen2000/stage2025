@@ -2,6 +2,7 @@ package glsib.stage2025.controller;
 
 import glsib.stage2025.model.Review;
 import glsib.stage2025.repository.ReviewRepository;
+import glsib.stage2025.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,14 @@ public class ReviewController {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private ReviewService reviewService;
+
+    @GetMapping("/service/{serviceId}")
+    public List<Review> getReviewsForService(@PathVariable String serviceId) {
+        return reviewRepository.findByServiceId(serviceId);
+    }
+
     @PostMapping
     public Review createReview(@RequestBody Review review) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -27,7 +36,7 @@ public class ReviewController {
         if (!isClient) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only clients can rate");
         review.setUserId(auth.getName());
         review.setReviewDate(LocalDateTime.now());
-        return reviewRepository.save(review);
+        return reviewService.saveReviewAndUpdateServiceRating(review);
     }
 
     @GetMapping

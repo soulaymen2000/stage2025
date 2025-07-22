@@ -1,5 +1,26 @@
 <app-navbar></app-navbar>
-<div class="min-h-screen flex items-center justify-center bg-darkmode">
+<div class="min-h-screen flex flex-col items-center bg-darkmode">
+  <div class="w-full max-w-4xl p-10 rounded-2xl shadow-2xl bg-[#23263b] text-center mb-10">
+    <h2 class="text-2xl font-bold text-primary mb-4">Recommandé pour vous</h2>
+    <div *ngIf="loadingRecommendations" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+    <div *ngIf="errorRecommendations && !loadingRecommendations" class="text-red-400">{{ errorRecommendations }}</div>
+    <div *ngIf="!loadingRecommendations && recommendations.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let s of recommendations" class="bg-[#23263b] rounded-xl shadow-lg p-5 flex flex-col items-start border border-dark_border hover:shadow-2xl transition">
+        <h4 class="text-lg font-semibold text-white mb-1">{{ s.title }}</h4>
+        <p class="text-grey text-sm mb-2">Catégorie : {{ s.category }}</p>
+        <p class="text-white text-sm mb-1">Prix : <span class="font-bold">{{ s.price }} DT</span></p>
+        <p class="text-grey text-xs mb-2">Lieu : {{ s.location }}</p>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-yellow-400">★</span>
+          <span class="text-white text-sm">{{ s.rating || 0 }}/5</span>
+        </div>
+        <a [routerLink]="['/services', s.id]" class="mt-auto bg-primary text-white px-4 py-1 rounded-lg font-medium hover:bg-opacity-90 transition">Voir Détail</a>
+      </div>
+    </div>
+    <div *ngIf="!loadingRecommendations && recommendations.length === 0 && !errorRecommendations" class="text-grey">Aucune recommandation pour le moment.</div>
+  </div>
   <div class="w-full max-w-xl p-10 rounded-2xl shadow-2xl bg-[#23263b] text-center">
     <h2 class="text-2xl font-bold text-primary mb-4">Bienvenue, Client !</h2>
     <p class="text-lg text-grey mb-6">Voici vos services réservés :</p>

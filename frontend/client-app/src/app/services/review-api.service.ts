@@ -12,4 +12,7 @@ export class ReviewApiService {
   getAllReviews(): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl);
   }
+  getReviewsForService(serviceId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/service/${serviceId}`);
+  }
 } 

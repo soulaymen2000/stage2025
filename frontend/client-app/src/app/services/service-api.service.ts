@@ -28,4 +28,12 @@ export class ServiceApiService {
   deleteService(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  getSimilarServices(id: string): Observable<Service[]> {
+    return this.http.get<Service[]>(`${this.baseUrl}/${id}/similar`);
+  }
+
+  getPersonalizedRecommendations(): Observable<Service[]> {
+    return this.http.get<Service[]>(`${this.baseUrl}/recommendations`);
+  }
 } 

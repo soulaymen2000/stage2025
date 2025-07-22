@@ -11,12 +11,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import glsib.stage2025.repository.ReservationRepository;
 
 @RestController
 @RequestMapping("/api/services")
 public class ServiceController {
     @Autowired
     private ServiceRepository serviceRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @GetMapping
     public List<Service> getAllServices(
@@ -59,6 +63,58 @@ public class ServiceController {
     @GetMapping("/{id}")
     public Service getService(@PathVariable String id) {
         return serviceRepository.findById(id).orElse(null);
+    }
+
+    @GetMapping("/{id}/similar")
+    public List<Service> getSimilarServices(@PathVariable String id) {
+        Service current = serviceRepository.findById(id).orElse(null);
+        if (current == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found");
+        }
+        List<Service> all = serviceRepository.findAll();
+        return all.stream()
+            .filter(s -> !s.getId().equals(id))
+            .map(s -> new Object[] { s, similarityScore(current, s) })
+            .sorted((a, b) -> Double.compare((double) ((Object[]) b)[1], (double) ((Object[]) a)[1]))
+            .limit(6)
+            .map(arr -> (Service) arr[0])
+            .toList();
+    }
+
+    private double similarityScore(Service a, Service b) {
+        double score = 0;
+        if (a.getCategory() != null && a.getCategory().equalsIgnoreCase(b.getCategory())) score += 5;
+        if (a.getLocation() != null && a.getLocation().equalsIgnoreCase(b.getLocation())) score += 2;
+        if (Math.abs(a.getPrice() - b.getPrice()) < 20) score += 1;
+        score += b.getRating(); // bonus for higher rating
+        return score;
+    }
+
+    @GetMapping("/recommendations")
+    public List<Service> getPersonalizedRecommendations() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        String userId = auth.getName();
+        // Get all reservations for this user
+        List<glsib.stage2025.model.Reservation> reservations = reservationRepository.findByUserId(userId);
+        if (reservations.isEmpty()) {
+            // If no history, recommend top-rated or most recent services
+            return serviceRepository.findAll().stream()
+                .sorted((a, b) -> Double.compare(b.getRating(), a.getRating()))
+                .limit(6)
+                .toList();
+        }
+        // Get all reserved service IDs
+        List<String> reservedServiceIds = reservations.stream().map(glsib.stage2025.model.Reservation::getServiceId).toList();
+        // Get reserved services to extract preferred categories
+        List<Service> reservedServices = serviceRepository.findAllById(reservedServiceIds);
+        List<String> preferredCategories = reservedServices.stream().map(Service::getCategory).distinct().toList();
+        // Recommend services in preferred categories, not already reserved, sorted by rating
+        return serviceRepository.findAll().stream()
+            .filter(s -> preferredCategories.contains(s.getCategory()) && !reservedServiceIds.contains(s.getId()))
+            .sorted((a, b) -> Double.compare(b.getRating(), a.getRating()))
+            .limit(6)
+            .toList();
     }
 
     @PostMapping
