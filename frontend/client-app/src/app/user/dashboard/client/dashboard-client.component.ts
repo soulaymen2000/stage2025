@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ReservationApiService } from '../../../services/reservation-api.service';
 import { ServiceApiService } from '../../../services/service-api.service';
 import { ReviewApiService } from '../../../services/review-api.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { Subject, forkJoin, of } from 'rxjs';
+import { takeUntil, switchMap, map, tap, catchError } from 'rxjs/operators';
+import { Reservation, ServiceModel, Review, Recommendation, ID } from '../../../shared/api-models';
 
 @Component({
   selector: 'app-dashboard-client',
@@ -10,14 +13,16 @@ import { ChangeDetectorRef } from '@angular/core';
   templateUrl: './dashboard-client.component.html',
   styleUrls: ['./dashboard-client.component.scss']
 })
-export class DashboardClientComponent implements OnInit {
-  reservations: any[] = [];
-  services: { [id: string]: any } = {};
-  reviews: { [serviceId: string]: any } = {};
+export class DashboardClientComponent implements OnInit, OnDestroy {
+  // Stronger typing for clarity
+  reservations: Reservation[] = [];
+  services: Record<string, ServiceModel> = {};
+  reviews: Record<string, Review> = {};
   loading = true;
   recommendations: any[] = [];
   loadingRecommendations = true;
   errorRecommendations: string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private reservationApi: ReservationApiService,
@@ -26,52 +31,104 @@ export class DashboardClientComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
-    this.reservationApi.getMyReservations().subscribe(reservations => {
-      console.log('API reservations:', reservations);
-      this.reservations = reservations;
-      this.cdr.detectChanges();
-      const serviceIds = reservations.map(r => r.serviceId);
-      this.serviceApi.getServices().subscribe(allServices => {
-        for (const s of allServices) {
-          if (s.id) {
-            this.services[s.id] = s;
-          }
+  isReserved(serviceId: string | number): boolean {
+    const key = String(serviceId);
+    return this.reservations.some((r: any) => r.service && String(r.service?.id) === key);
+  }
+
+  isReviewed(serviceId: string | number): boolean {
+    return !!this.reviews[String(serviceId)];
+  }
+
+  getReviewFor(serviceId: string | number | null | undefined): Review | undefined {
+    if (serviceId == null) return undefined;
+    return this.reviews[String(serviceId)];
+  }
+
+  ngOnInit(): void {
+    // Load reservations -> services (only needed ones) -> reviews (client reviews)
+    this.reservationApi.getMyReservations().pipe(
+      takeUntil(this.destroy$),
+      tap(res => {
+        this.reservations = res || [];
+      }),
+      switchMap(reservations => {
+        const serviceIds = (reservations || [])
+          .map(r => r.service?.id)
+          .filter((id): id is string => id !== undefined && id !== null);
+
+        if (!serviceIds.length) {
+          // still try to load reviews to populate any existing ones, but services empty
+          return forkJoin({
+            services: of([] as ServiceModel[]),
+            reviews: this.reviewApi.getMyReviews().pipe(catchError(() => of([] as Review[])))
+          });
         }
-        this.cdr.detectChanges();
-        this.loadReviews(serviceIds);
-      }, () => { this.loading = false; this.cdr.detectChanges(); });
-      if (!serviceIds.length) {
-        this.loading = false;
-        this.cdr.detectChanges();
+
+        // fetch all services once and filter locally (alternatively add API to fetch by ids)
+        return forkJoin({
+          services: this.serviceApi.getServices().pipe(
+            map((all: any[]) => (all || []).filter((s: any) => s && s.id != null && serviceIds.includes(s.id)) as ServiceModel[]),
+            catchError(() => of([] as ServiceModel[]))
+          ),
+          reviews: this.reviewApi.getMyReviews().pipe(catchError(() => of([] as Review[])))
+        });
+      }),
+      catchError(() => {
+        // On top-level error return empty result so UI can recover
+        return of({ services: [] as ServiceModel[], reviews: [] as Review[] });
+      })
+    ).subscribe(({ services, reviews }) => {
+      // map services
+        for (const s of services) {
+        if (s && s.id != null) this.services[String(s.id)] = s;
       }
-    }, () => { this.loading = false; this.cdr.detectChanges(); });
+
+      // map reviews by service id
+      for (const r of reviews) {
+        if (r && r.service && r.service.id != null) this.reviews[String(r.service.id)] = r;
+      }
+
+      this.loading = false;
+      this.cdr.detectChanges();
+    }, () => {
+      this.loading = false;
+      this.cdr.detectChanges();
+    });
 
     // Fetch personalized recommendations
-    this.serviceApi.getPersonalizedRecommendations().subscribe({
-      next: (recs) => {
-        this.recommendations = recs;
-        this.loadingRecommendations = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
+    this.serviceApi.getPersonalizedRecommendations().pipe(
+      takeUntil(this.destroy$),
+      catchError(() => {
         this.errorRecommendations = 'Erreur lors du chargement des recommandations.';
         this.loadingRecommendations = false;
         this.cdr.detectChanges();
-      }
+        return of([] as Recommendation[]);
+      })
+    ).subscribe((recs: Recommendation[]) => {
+      this.recommendations = recs || [];
+      this.loadingRecommendations = false;
+      this.cdr.detectChanges();
     });
   }
 
   loadReviews(serviceIds: string[]) {
-    this.reviewApi.getAllReviews().subscribe(allReviews => {
-      for (const r of allReviews) {
-        if (serviceIds.includes(r.serviceId)) {
-          this.reviews[r.serviceId] = r;
+    // kept for backward compatibility but no longer used in main flow
+    this.reviewApi.getMyReviews().pipe(takeUntil(this.destroy$)).subscribe(myReviews => {
+      for (const r of myReviews) {
+        if (r.service && r.service.id != null && serviceIds.includes(String(r.service.id))) {
+          this.reviews[String(r.service.id)] = r;
         }
       }
       this.loading = false;
       this.cdr.detectChanges();
-      console.log('Reservations:', this.reservations.length, 'Services:', Object.keys(this.services).length, 'Reviews:', Object.keys(this.reviews).length);
     }, () => { this.loading = false; this.cdr.detectChanges(); });
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
+
+// Types are imported from shared/api-models.ts

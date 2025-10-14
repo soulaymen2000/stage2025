@@ -1,0 +1,186 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{Rapport de Projet -- Plateforme de Réservation de Services}
+\author{Soulayman Omrani}
+\date{Août 2025}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+\section{Contexte et motivation}
+La digitalisation des services a transformé la manière dont les utilisateurs accèdent à des prestations diverses (coiffure, réparation, formation, etc.). Ce projet vise à concevoir et réaliser une plateforme web moderne permettant la réservation et la notation de services, tout en garantissant la sécurité, la simplicité d’utilisation et la robustesse des échanges.
+
+\section{Objectifs}
+\begin{itemize}
+  \item Permettre à un client de réserver un service en ligne et de le noter après utilisation.
+  \item Offrir aux propriétaires la possibilité de gérer leurs services et de consulter les retours clients.
+  \item Garantir la sécurité des données et l’authentification des utilisateurs.
+  \item Proposer une interface utilisateur moderne et responsive.
+\end{itemize}
+
+\chapter{Gestion de Projet -- Méthodologie SCRUM}
+\section{Choix de la méthode}
+Le projet a été mené selon la méthodologie agile SCRUM, favorisant l’adaptation continue, la collaboration et la livraison incrémentale de valeur.
+
+\section{Rôles et responsabilités}
+\begin{itemize}
+  \item \textbf{Product Owner} : Soulayman Omrani -- définit les besoins et priorités.
+  \item \textbf{Scrum Master} : Soulayman Omrani -- facilite le processus SCRUM.
+  \item \textbf{Développeur} : Soulayman Omrani -- conçoit, code, teste et documente.
+\end{itemize}
+
+\section{Organisation des Sprints}
+Le projet a été découpé en 4 sprints principaux :
+\begin{description}
+  \item[Sprint 1] Initialisation du projet, configuration des outils, authentification, base de données.
+  \item[Sprint 2] Développement des fonctionnalités de réservation et affichage des services.
+  \item[Sprint 3] Ajout de la notation, gestion des droits et sécurité avancée.
+  \item[Sprint 4] Amélioration de l’UI/UX, gestion des erreurs, tests, documentation.
+\end{description}
+
+\section{Backlog produit (extraits)}
+\begin{itemize}
+  \item En tant qu’utilisateur, je peux m’inscrire et me connecter pour accéder à la plateforme.
+  \item En tant que client, je peux réserver un service proposé.
+  \item En tant que client, je peux noter un service que j’ai réservé.
+  \item En tant que propriétaire, je peux ajouter et gérer mes services.
+  \item En tant qu’utilisateur, je ne peux réserver ou noter un service qu’une seule fois.
+\end{itemize}
+
+\section{Gestion SCRUM}
+Des réunions quotidiennes (Daily Scrum) ont permis de suivre l’avancement, lever les blocages et ajuster les priorités. Chaque sprint s’est conclu par une revue (Sprint Review) et une rétrospective pour améliorer le processus.
+
+\chapter{Conception}
+\section{Architecture générale}
+Le projet adopte une architecture en couches, séparant clairement les responsabilités :
+\begin{itemize}
+  \item \textbf{Frontend} : Application Angular (TypeScript, TailwindCSS) pour l’interface utilisateur, la navigation et la logique côté client.
+  \item \textbf{Backend} : API REST Spring Boot (Java) pour la logique métier, la sécurité (Spring Security, JWT) et l’accès aux données.
+  \item \textbf{Base de données} : PostgreSQL pour la persistance des utilisateurs, services, réservations et avis.
+\end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{architecture.png}
+  \caption{Architecture générale du projet}
+\end{figure}
+
+\section{Diagrammes de conception}
+\subsection{Diagramme de cas d’utilisation}
+	extit{Voir fichier \texttt{usecase.puml} dans le dossier rapport.}
+
+\subsection{Diagramme de classes}
+	extit{Voir fichier \texttt{classes.puml} dans le dossier rapport.}
+
+\subsection{Diagramme de séquence (réservation)}
+	extit{Voir fichier \texttt{sequence\_reservation.puml} dans le dossier rapport.}
+
+\chapter{Développement}
+\section{Backend}
+\subsection{Technologies et outils}
+Spring Boot, Spring Data JPA, Spring Security, JWT, PostgreSQL.
+
+\subsection{Principales entités}
+\begin{description}
+  \item[User] Gère l’authentification, les rôles (client/propriétaire).
+  \item[Service] Représente une prestation proposée.
+  \item[Reservation] Lien entre un client et un service réservé.
+  \item[Review] Avis et note laissés par un client sur un service réservé.
+\end{description}
+
+\subsection{Endpoints REST principaux}
+\begin{itemize}
+  \item \texttt{/api/auth} : Authentification, inscription, gestion JWT
+  \item \texttt{/api/services} : CRUD services, recommandations
+  \item \texttt{/api/reservations/my} : Réservations de l’utilisateur connecté
+  \item \texttt{/api/reviews/my} : Avis de l’utilisateur connecté
+\end{itemize}
+
+\subsection{Sécurité}
+\begin{itemize}
+  \item Authentification JWT, gestion des rôles, sécurisation des endpoints
+  \item Validation des entrées, gestion des erreurs (400, 403, 409, etc.)
+\end{itemize}
+
+\section{Frontend}
+\subsection{Technologies et outils}
+Angular, RxJS, TailwindCSS.
+
+\subsection{Composants principaux}
+\begin{itemize}
+  \item Authentification (login/register)
+  \item Dashboard client (réservations, notes)
+  \item Gestion des services (affichage, réservation, notation)
+\end{itemize}
+
+\subsection{Logique d’interface}
+\begin{itemize}
+  \item Affichage conditionnel (boutons désactivés si déjà réservé/noté)
+  \item Gestion des états (loading, erreurs, feedback utilisateur)
+  \item Design responsive et moderne
+\end{itemize}
+
+\chapter{Tests et Déploiement}
+\section{Tests}
+\begin{itemize}
+  \item Tests unitaires backend (services, contrôleurs)
+  \item Tests d’intégration (API, base de données)
+  \item Tests manuels frontend (navigation, scénarios utilisateurs)
+\end{itemize}
+
+\section{Déploiement}
+\begin{itemize}
+  \item Déploiement local (Docker, scripts npm/mvn)
+  \item Gestion des environnements (dev, prod)
+\end{itemize}
+
+\chapter{Conclusion et Rétrospective}
+\section{Bilan des sprints}
+Chaque sprint a permis d’atteindre des objectifs précis, avec une livraison incrémentale de fonctionnalités.
+
+\section{Difficultés rencontrées}
+\begin{itemize}
+  \item Problèmes de sérialisation JSON (annotations Jackson)
+  \item Mapping Angular (serviceId vs service.id)
+  \item Sécurisation des endpoints et gestion des droits
+  \item Synchronisation des données frontend/backend
+\end{itemize}
+
+\section{Améliorations possibles}
+\begin{itemize}
+  \item Pagination, recherche avancée, notifications
+  \item Tests automatisés frontend
+  \item Déploiement cloud
+\end{itemize}
+
+\appendix
+\chapter{Annexes}
+\section{Extraits de code importants}
+\begin{itemize}
+  \item Contrôleur Spring Boot pour les réservations et avis
+  \item Service Angular pour l’appel API
+\end{itemize}
+
+\section{Captures d’écran de l’application}
+\begin{itemize}
+  \item Dashboard client
+  \item Formulaire de réservation
+  \item Affichage des notes
+\end{itemize}
+
+\section{Scripts SQL de création de la base}
+\begin{itemize}
+  \item Tables : users, services, reservations, reviews
+\end{itemize}
+
+\end{document}

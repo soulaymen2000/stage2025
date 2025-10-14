@@ -1,0 +1,12 @@
+# FastAPI and Uvicorn
+## FastAPI compatible with Pydantic v2
+fastapi>=0.100.0
+uvicorn[standard]==0.23.2
+# Use Pydantic v2 series which is compatible with Python 3.13
+pydantic>=2.2.0
+# Optional: if your pickle was created with scikit-learn / numpy
+# Optional: if your pickle was created with scikit-learn / numpy
+numpy>=1.25.0
+scikit-learn>=1.3.0
+# For model serialization compatibility (if used):
+# joblib>=1.3.1

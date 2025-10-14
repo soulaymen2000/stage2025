@@ -9,8 +9,18 @@ export class ServiceApiService {
 
   constructor(private http: HttpClient) {}
 
-  getServices(params?: any): Observable<Service[]> {
-    return this.http.get<Service[]>(this.baseUrl, { params });
+  /**
+   * params: simple key/value filter map used for query params.
+   */
+  getServices(params?: Record<string, string | number | null>): Observable<Service[]> {
+    const safeParams: any = {};
+    if (params) {
+      for (const k of Object.keys(params)) {
+        const v = params[k as keyof typeof params];
+        if (v != null) safeParams[k] = String(v);
+      }
+    }
+    return this.http.get<Service[]>(this.baseUrl, { params: safeParams });
   }
 
   getService(id: string): Observable<Service> {

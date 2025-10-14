@@ -1,0 +1,15 @@
+@startuml
+left to right direction
+actor Utilisateur
+actor Client
+actor Proprietaire
+rectangle "Plateforme" {
+  Utilisateur -- (S'inscrire / Se connecter)
+  Client -- (Réserver un service)
+  Client -- (Noter un service)
+  Client -- (Consulter ses réservations)
+  Client -- (Consulter ses notes)
+  Proprietaire -- (Ajouter un service)
+  Proprietaire -- (Consulter ses services)
+}
+@enduml

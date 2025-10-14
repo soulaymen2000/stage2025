@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChangeDetectorRef } from '@angular/core';
 import { ReservationApiService } from '../reservation-api.service';
 import { ReviewApiService } from '../review-api.service';
+import { ReservationCreate, ReviewCreate } from '../../shared/api-models';
 
 @Component({
   selector: 'app-fournisseur-services',
@@ -13,8 +14,9 @@ import { ReviewApiService } from '../review-api.service';
   styleUrls: ['./fournisseur-services2.scss'],
   standalone: false
 })
+
 export class FournisseurServices2Component implements OnInit {
-  services: Array<Service>=[]
+  services: Array<Service> = [];
   serviceForm: FormGroup;
   editing = false;
   editingId: string | null = null;
@@ -31,14 +33,14 @@ export class FournisseurServices2Component implements OnInit {
   successRating: { [serviceId: string]: boolean } = {};
   errorReservation: { [serviceId: string]: string } = {};
   errorRating: { [serviceId: string]: string } = {};
-  public myReservations: { [serviceId: string]: boolean } = {};
+
   constructor(
     private api: ServiceApiService,
     private reservationApi: ReservationApiService,
     private reviewApi: ReviewApiService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef
   ) {
     this.serviceForm = this.fb.group({
       title: '',
@@ -48,6 +50,8 @@ export class FournisseurServices2Component implements OnInit {
       location: ''
     });
   }
+  public myReservations: { [serviceId: string]: boolean } = {};
+  // ...existing code...
 
   ngOnInit() {
     // Detect role
@@ -93,8 +97,11 @@ export class FournisseurServices2Component implements OnInit {
     this.loadServices();
     this.reservationApi.getMyReservations().subscribe(reservations => {
       for (const r of reservations) {
-        if (r.serviceId) {
-          this.myReservations[r.serviceId] = true;
+        // support both payload shapes: reservation.service?.id or reservation.serviceId
+        const maybe = r as any;
+        const sid = maybe.serviceId ?? maybe.service?.id;
+        if (sid != null) {
+          this.myReservations[String(sid)] = true;
         }
       }
     });
@@ -107,7 +114,7 @@ export class FournisseurServices2Component implements OnInit {
       this.services = res;
         this.loading = false;
       this.ready = true;
-      this.cdr.detectChanges();
+      this.cdRef.detectChanges();
       },
     error => {
         this.loading = false;
@@ -175,28 +182,37 @@ export class FournisseurServices2Component implements OnInit {
     this.api.deleteService(id).subscribe({
       next: () => {
         this.loadServices();
+        setTimeout(() => this.cdRef.detectChanges()); // Defer change detection to next tick
         this.snackBar.open('Service supprimé !', 'Fermer', { duration: 2000 });
         this.loading = false;
       },
-      error: () => {
-        this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+      error: (err) => {
+        if (err.status === 409) {
+          const msg = err.error?.message || 'Erreur lors de la suppression';
+          this.snackBar.open(msg, 'Fermer', { duration: 5000 });
+        } else {
+          this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+        }
         this.loading = false;
       }
     });
   }
 
   reserve(serviceId: string) {
-    this.loadingReservation[serviceId] = true;
-    this.successReservation[serviceId] = false;
-    this.errorReservation[serviceId] = '';
-    this.reservationApi.createReservation({ serviceId }).subscribe({
+    const key = String(serviceId);
+    this.loadingReservation[key] = true;
+    this.successReservation[key] = false;
+    this.errorReservation[key] = '';
+    const payload: ReservationCreate = { serviceId };
+    this.reservationApi.createReservation(payload).subscribe({
       next: () => {
-        this.successReservation[serviceId] = true;
-        this.loadingReservation[serviceId] = false;
+        this.successReservation[key] = true;
+        this.loadingReservation[key] = false;
+        this.myReservations[key] = true;
       },
       error: (err: any) => {
-        this.errorReservation[serviceId] = err.error?.message || 'Erreur lors de la réservation';
-        this.loadingReservation[serviceId] = false;
+        this.errorReservation[key] = err.error?.message || 'Erreur lors de la réservation';
+        this.loadingReservation[key] = false;
       }
     });
   }
@@ -209,11 +225,12 @@ export class FournisseurServices2Component implements OnInit {
     this.loadingRating[serviceId] = true;
     this.successRating[serviceId] = false;
     this.errorRating[serviceId] = '';
-    this.reviewApi.createReview({
+    const payload: ReviewCreate = {
       serviceId,
       rating: this.rating[serviceId],
       comment: this.comment[serviceId] || ''
-    }).subscribe({
+    };
+    this.reviewApi.createReview(payload).subscribe({
       next: () => {
         this.successRating[serviceId] = true;
         this.loadingRating[serviceId] = false;

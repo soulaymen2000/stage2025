@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ServiceApiService } from '../service-api.service';
 import { ReviewApiService } from '../review-api.service';
-import { Subscription } from 'rxjs';
+import { Service } from '../service.model';
+import { Subscription, EMPTY } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
@@ -12,10 +13,10 @@ import { switchMap } from 'rxjs/operators';
   styleUrl: './service-detail.scss'
 })
 export class ServiceDetail implements OnInit, OnDestroy {
-  public service: any = null;
+  public service: Service | null = null;
   public loading = true;
   public error: string | null = null;
-  public similarServices: any[] = [];
+  public similarServices: Service[] = [];
   public reviews: any[] = [];
   public loadingReviews = true;
   public errorReviews: string | null = null;
@@ -47,46 +48,48 @@ export class ServiceDetail implements OnInit, OnDestroy {
           this.loading = false;
           this.loadingReviews = false;
           this.cdr.detectChanges();
-          return [];
+          return EMPTY;
         }
-
-        console.log(`[Debug] Fetching service with ID: ${id}`);
-        return this.api.getService(id);
+        return this.api.getService(id as string);
       })
     ).subscribe({
       next: (service) => {
-        console.log('[Debug] Received service from API:', service);
         if (!service) {
           this.error = 'Service introuvable.';
           this.service = null;
           this.loadingReviews = false;
         } else {
-          this.service = service;
+          this.service = service as Service;
           // Fetch similar services only if main service was found
-          this.api.getSimilarServices(this.service.id).subscribe({
-            next: (similars) => {
-              console.log('[Debug] Received similar services:', similars);
-              this.similarServices = similars;
-              this.cdr.detectChanges(); // Update view with similar services
-            },
-            error: (err) => {
-              console.error('[Debug] Error fetching similar services:', err);
-              this.cdr.detectChanges();
-            }
-          });
+          const sid = this.service?.id;
+          if (sid != null) {
+            this.api.getSimilarServices(String(sid)).subscribe({
+              next: (similars: Service[]) => {
+                this.similarServices = similars || [];
+                this.cdr.detectChanges(); // Update view with similar services
+              },
+              error: () => {
+                this.cdr.detectChanges();
+              }
+            });
+          }
           // Fetch reviews for this service
-          this.reviewApi.getReviewsForService(this.service.id).subscribe({
-            next: (reviews) => {
-              this.reviews = reviews;
-              this.loadingReviews = false;
-              this.cdr.detectChanges();
-            },
-            error: (err) => {
-              this.errorReviews = 'Erreur lors du chargement des avis.';
-              this.loadingReviews = false;
-              this.cdr.detectChanges();
-            }
-          });
+          if (sid != null) {
+            this.reviewApi.getReviewsForService(String(sid)).subscribe({
+              next: (reviews) => {
+                this.reviews = reviews || [];
+                this.loadingReviews = false;
+                this.cdr.detectChanges();
+              },
+              error: () => {
+                this.errorReviews = 'Erreur lors du chargement des avis.';
+                this.loadingReviews = false;
+                this.cdr.detectChanges();
+              }
+            });
+          } else {
+            this.loadingReviews = false;
+          }
         }
         this.loading = false;
         this.cdr.detectChanges(); // Final update for the main service

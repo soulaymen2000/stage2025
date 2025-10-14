@@ -1,8 +1,10 @@
 import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ServiceApiService } from '../service-api.service';
+import { Service } from '../service.model';
 import { ReservationApiService } from '../reservation-api.service';
 import { ReviewApiService } from '../review-api.service';
+import { ReservationCreate, ReviewCreate } from '../../shared/api-models';
 
 @Component({
   selector: 'app-service-list',
@@ -11,7 +13,7 @@ import { ReviewApiService } from '../review-api.service';
   styleUrl: './service-list.scss'
 })
 export class ServiceList implements OnInit {
-  public services: any[] = [];
+  public services: Service[] = [];
   public isClient = false;
   public isFournisseur = false;
   public rating: { [serviceId: string]: number } = {};
@@ -79,25 +81,24 @@ export class ServiceList implements OnInit {
   }
 
   fetchServices() {
-    const params: any = {};
-    if (this.filter.category) params.category = this.filter.category;
-    if (this.filter.minPrice != null) params.minPrice = this.filter.minPrice;
-    if (this.filter.maxPrice != null) params.maxPrice = this.filter.maxPrice;
-    if (this.filter.location) params.location = this.filter.location;
-    if (this.filter.minRating != null) params.minRating = this.filter.minRating;
+    const params: Record<string, string | number | null> = {};
+  if (this.filter.category) params['category'] = this.filter.category;
+  if (this.filter.minPrice != null) params['minPrice'] = this.filter.minPrice;
+  if (this.filter.maxPrice != null) params['maxPrice'] = this.filter.maxPrice;
+  if (this.filter.location) params['location'] = this.filter.location;
+  if (this.filter.minRating != null) params['minRating'] = this.filter.minRating;
     this.api.getServices(params).subscribe({
-      next: services => {
-        this.services = services;
+      next: (services: Service[]) => {
+        this.services = services || [];
         this.forbiddenError = null;
         this.cdr.detectChanges();
       },
-      error: err => {
-        if (err.status === 403) {
+      error: (err: any) => {
+        this.services = [];
+        if (err?.status === 403) {
           this.forbiddenError = 'Vous devez être connecté pour voir les services.';
-          this.services = [];
         } else {
           this.forbiddenError = 'Erreur lors du chargement des services.';
-          this.services = [];
         }
         this.cdr.detectChanges();
       }
@@ -119,43 +120,87 @@ export class ServiceList implements OnInit {
     this.fetchServices();
   }
 
-  reserve(serviceId: string) {
-    this.loadingReservation[serviceId] = true;
-    this.successReservation[serviceId] = false;
-    this.errorReservation[serviceId] = '';
-    this.reservationApi.createReservation({ serviceId }).subscribe({
+  reserve(serviceId?: string) {
+    const key = String(serviceId);
+    this.loadingReservation[key] = true;
+    this.successReservation[key] = false;
+    this.errorReservation[key] = '';
+  const payload: ReservationCreate = { service: { id: String(serviceId) } };
+  this.reservationApi.createReservation(payload).subscribe({
       next: () => {
-        this.successReservation[serviceId] = true;
-        this.loadingReservation[serviceId] = false;
+        this.successReservation[key] = true;
+        this.loadingReservation[key] = false;
       },
       error: err => {
-        this.errorReservation[serviceId] = err.error?.message || 'Erreur lors de la réservation';
-        this.loadingReservation[serviceId] = false;
+        // Show friendly message for duplicate reservation
+        if (err.status === 409) {
+          this.errorReservation[key] = 'Vous avez déjà réservé ce service.';
+        } else {
+          this.errorReservation[key] = err.error?.message || 'Erreur lors de la réservation';
+        }
+        this.loadingReservation[key] = false;
       }
     });
   }
 
-  setRating(serviceId: string, value: number) {
-    this.rating[serviceId] = value;
+  setRating(serviceId?: string, value?: number) {
+    const key = String(serviceId);
+    this.rating[key] = value || 0;
   }
 
-  submitRating(serviceId: string) {
-    this.loadingRating[serviceId] = true;
-    this.successRating[serviceId] = false;
-    this.errorRating[serviceId] = '';
-    this.reviewApi.createReview({
-      serviceId,
-      rating: this.rating[serviceId],
-      comment: this.comment[serviceId] || ''
-    }).subscribe({
+  submitRating(serviceId?: string) {
+    const key = String(serviceId);
+    this.loadingRating[key] = true;
+    this.successRating[key] = false;
+    this.errorRating[key] = '';
+    // Send service as object with id for backend compatibility
+  const reviewPayload: ReviewCreate = { service: { id: String(serviceId) }, rating: this.rating[key], comment: this.comment[key] || '' };
+    this.reviewApi.createReview(reviewPayload).subscribe({
       next: () => {
-        this.successRating[serviceId] = true;
-        this.loadingRating[serviceId] = false;
+        this.successRating[key] = true;
+        this.loadingRating[key] = false;
       },
       error: err => {
-        this.errorRating[serviceId] = err.error?.message || 'Erreur lors de la notation';
-        this.loadingRating[serviceId] = false;
+        this.errorRating[key] = err.error?.message || 'Erreur lors de la notation';
+        this.loadingRating[key] = false;
       }
     });
+  }
+
+  // Template-friendly getters (avoid indexing with possibly undefined keys)
+  getLoadingReservation(serviceId?: string) {
+    return !!this.loadingReservation[String(serviceId)];
+  }
+
+  getSuccessReservation(serviceId?: string) {
+    return !!this.successReservation[String(serviceId)];
+  }
+
+  getErrorReservation(serviceId?: string) {
+    return this.errorReservation[String(serviceId)] || '';
+  }
+
+  getLoadingRating(serviceId?: string) {
+    return !!this.loadingRating[String(serviceId)];
+  }
+
+  getSuccessRating(serviceId?: string) {
+    return !!this.successRating[String(serviceId)];
+  }
+
+  getErrorRating(serviceId?: string) {
+    return this.errorRating[String(serviceId)] || '';
+  }
+
+  getRating(serviceId?: string) {
+    return this.rating[String(serviceId)] || 0;
+  }
+
+  getComment(serviceId?: string) {
+    return this.comment[String(serviceId)] || '';
+  }
+
+  setComment(serviceId?: string, value?: string) {
+    this.comment[String(serviceId)] = value || '';
   }
 }

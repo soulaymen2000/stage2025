@@ -1,0 +1,32 @@
+@startuml
+class User {
+  - id: Long
+  - email: String
+  - password: String
+  - role: String
+}
+class Service {
+  - id: Long
+  - title: String
+  - description: String
+  - category: String
+  - price: double
+  - location: String
+  - rating: double
+}
+class Reservation {
+  - id: Long
+  - reservationDate: Date
+  - status: String
+}
+class Review {
+  - id: Long
+  - rating: int
+  - comment: String
+  - reviewDate: Date
+}
+User "1" -- "*" Reservation
+User "1" -- "*" Review
+Service "1" -- "*" Reservation
+Service "1" -- "*" Review
+@enduml

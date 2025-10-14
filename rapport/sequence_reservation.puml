@@ -1,0 +1,12 @@
+@startuml
+actor Client
+participant Frontend as Angular
+participant Backend as SpringBoot
+participant DB as PostgreSQL
+Client -> Angular : Sélectionne un service
+Angular -> SpringBoot : POST /api/reservations
+SpringBoot -> DB : Vérifie/ajoute réservation
+DB --> SpringBoot : OK/Erreur
+SpringBoot --> Angular : Réponse (succès/erreur)
+Angular --> Client : Affiche confirmation/erreur
+@enduml
