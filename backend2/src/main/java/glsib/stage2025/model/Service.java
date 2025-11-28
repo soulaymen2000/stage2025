@@ -23,8 +23,9 @@ public class Service {
     @NotBlank(message = "Description is required")
     private String description;
     
-    @NotBlank(message = "Category is required")
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Category is required")
+    private ServiceCategory category;
     
     @Positive(message = "Price must be positive")
     private double price;
@@ -56,8 +57,8 @@ public class Service {
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public ServiceCategory getCategory() { return category; }
+    public void setCategory(ServiceCategory category) { this.category = category; }
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
     public String getLocation() { return location; }

@@ -21,6 +21,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/ws").permitAll()
                 // Services: public GETs, restricted mutations
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/services", "/api/services/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/services/**").hasRole("FOURNISSEUR")
@@ -31,6 +33,9 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/reviews/my").hasAnyRole("CLIENT", "FOURNISSEUR", "ADMIN")
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/reviews/**").hasAnyRole("CLIENT", "FOURNISSEUR", "ADMIN")
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/reviews/**").hasRole("CLIENT")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                 .requestMatchers("/static/**", "/", "/index.html", "/favicon.ico").permitAll()
                 .anyRequest().authenticated()
             )

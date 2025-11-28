@@ -1,6 +1,9 @@
 import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app-module';
 
+// Polyfill for sockjs-client
+(window as any).global = window;
+
 platformBrowser().bootstrapModule(AppModule, {
   
 })

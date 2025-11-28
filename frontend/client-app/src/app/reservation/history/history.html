@@ -1,1 +1,41 @@
-<p>history works!</p>
+<div class="reservation-history">
+  <h2>Mes Réservations</h2>
+
+  <p>Nombre de réservations: {{ reservations.length }}</p>
+
+  <div *ngIf="loading" class="loading">
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="!loading && reservations.length === 0" class="no-reservations">
+    <p>Aucune réservation trouvée.</p>
+  </div>
+
+  <div *ngIf="!loading && reservations.length > 0" class="reservations-list">
+    <div *ngFor="let reservation of reservations" class="reservation-card">
+      <div class="reservation-info">
+        <h3>Réservation #{{ reservation.id }}</h3>
+        <p><strong>Service:</strong> {{ reservation.service?.title || 'N/A' }}</p>
+        <p><strong>Date:</strong> {{ reservation.reservationDate | date:'short' }}</p>
+        <button (click)="openChat(reservation)" class="chat-btn">
+          💬 Ouvrir la messagerie
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Modal -->
+  <div *ngIf="showChat && selectedReservation && selectedReservation.id && currentUserId && otherUserId" class="chat-modal">
+    <div class="chat-modal-content">
+      <div class="chat-header">
+        <h3>Messagerie - Réservation #{{ selectedReservation.id }}</h3>
+        <button (click)="closeChat()" class="close-btn">×</button>
+      </div>
+      <app-chat 
+        [reservationId]="selectedReservation.id!"
+        [currentUserId]="currentUserId"
+        [otherUserId]="otherUserId">
+      </app-chat>
+    </div>
+  </div>
+</div>

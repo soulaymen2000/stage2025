@@ -25,6 +25,15 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    
+    // Additional fields for flexible messaging
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private User client;
+    
+    @ManyToOne
+    @JoinColumn(name = "fournisseur_id")
+    private User fournisseur;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -38,4 +47,10 @@ public class Reservation {
     public void setStatus(String status) { this.status = status; }
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    
+    // Additional getters and setters for client and fournisseur
+    public User getClient() { return client; }
+    public void setClient(User client) { this.client = client; }
+    public User getFournisseur() { return fournisseur; }
+    public void setFournisseur(User fournisseur) { this.fournisseur = fournisseur; }
 }

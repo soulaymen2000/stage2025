@@ -57,6 +57,10 @@ export class LoginComponent {
             this.router.navigate(['/user/dashboard-fournisseur']).catch(() => {
               this.errorMsg = "Redirection vers le dashboard fournisseur impossible. Vérifiez la route.";
             });
+          } else if ((Array.isArray(role) && role.includes('ADMIN')) || role === 'ADMIN') {
+            this.router.navigate(['/user/dashboard-admin']).catch(() => {
+              this.errorMsg = "Redirection vers le dashboard admin impossible. Vérifiez la route.";
+            });
           } else {
             this.router.navigate(['/user/dashboard-client']).catch(() => {
               this.errorMsg = "Redirection vers le dashboard client impossible. Vérifiez la route.";

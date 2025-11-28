@@ -14,6 +14,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,7 +52,8 @@ public class FournisseurController {
         }
 
         List<Long> serviceIds = services.stream().map(Service::getId).collect(Collectors.toList());
-        List<Reservation> reservations = reservationRepository.findByService_IdIn(serviceIds);
+        // Only count CONFIRMED reservations for revenue calculation
+        List<Reservation> reservations = reservationRepository.findByService_IdInAndStatus(serviceIds, "CONFIRMED");
 
         double totalRevenue = reservations.stream()
                 .map(r -> services.stream().filter(s -> s.getId().equals(r.getService().getId())).findFirst().orElse(null))
@@ -57,7 +61,9 @@ public class FournisseurController {
                 .mapToDouble(Service::getPrice)
                 .sum();
 
-        long totalReservations = reservations.size();
+        // Count all reservations for totalReservations
+        List<Reservation> allReservations = reservationRepository.findByService_IdIn(serviceIds);
+        long totalReservations = allReservations.size();
 
         double averageRating = services.stream()
                 .mapToDouble(Service::getRating)
@@ -91,15 +97,46 @@ public class FournisseurController {
                     Service service = serviceMap.get(r.getService().getId());
                     User client = clientMap.get(r.getUser().getId());
                     String clientName = client != null ? client.getFirstName() + " " + client.getLastName() : "Client inconnu";
-                    return new ReservationDetailDto(
-                            r.getId(),
+                    ReservationDetailDto dto = new ReservationDetailDto(
+                            r.getId(), // This is a Long
                             service.getTitle(),
                             clientName,
+                            client != null ? client.getId() : null,
                             r.getReservationDate(),
                             r.getStatus(),
                             service.getPrice()
                     );
+                    System.out.println("Sending reservation DTO: " + dto.getReservationId() + ", service: " + dto.getServiceName());
+                    return dto;
                 })
                 .collect(Collectors.toList());
     }
-} 
+
+    // Add endpoint to update reservation status
+    @PutMapping("/reservations/{reservationId}/status")
+    public Reservation updateReservationStatus(@PathVariable Long reservationId, @RequestBody Map<String, String> payload) {
+        System.out.println("Received request to update reservation " + reservationId + " status");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = auth.getName();
+        User owner = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+
+        // Check if the reservation belongs to a service owned by this fournisseur
+        if (!reservation.getService().getOwner().getId().equals(owner.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to update this reservation");
+        }
+
+        String newStatus = payload.get("status");
+        System.out.println("New status: " + newStatus);
+        if (newStatus == null || (!newStatus.equals("PENDING") && !newStatus.equals("CONFIRMED") && !newStatus.equals("CANCELLED"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
+        }
+
+        reservation.setStatus(newStatus);
+        Reservation saved = reservationRepository.save(reservation);
+        System.out.println("Reservation status updated successfully");
+        return saved;
+    }
+}

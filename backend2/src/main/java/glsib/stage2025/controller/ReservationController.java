@@ -94,16 +94,18 @@ public class ReservationController {
         public double price;
         public String location;
         public double rating;
+        public Long ownerId; // Add ownerId for messaging
 
         public static ServiceDTO fromEntity(glsib.stage2025.model.Service s) {
             ServiceDTO dto = new ServiceDTO();
             dto.id = s.getId();
             dto.title = s.getTitle();
             dto.description = s.getDescription();
-            dto.category = s.getCategory();
+            dto.category = String.valueOf(s.getCategory());
             dto.price = s.getPrice();
             dto.location = s.getLocation();
             dto.rating = s.getRating();
+            dto.ownerId = s.getOwner() != null ? s.getOwner().getId() : null; // Set ownerId
             return dto;
         }
     }

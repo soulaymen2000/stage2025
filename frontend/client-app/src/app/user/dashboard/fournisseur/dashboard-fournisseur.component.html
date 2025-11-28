@@ -8,7 +8,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Total Revenue -->
       <div class="bg-[#23263b] p-6 rounded-2xl shadow-lg border border-dark_border">
-        <h2 class="text-lg font-semibold text-grey mb-2">Revenu Total</h2>
+        <h2 class="text-lg font-semibold text-grey mb-2">Revenu Total (Confirmé)</h2>
         <div *ngIf="loadingStats; else revenueStat" class="h-10 flex items-center">
           <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
         </div>
@@ -41,6 +41,8 @@
       </div>
     </div>
 
+  
+
     <!-- Reservations Table -->
     <div class="bg-[#23263b] p-6 rounded-2xl shadow-lg border border-dark_border">
       <h2 class="text-2xl font-bold text-white mb-6">Dernières Réservations</h2>
@@ -59,6 +61,7 @@
               <th class="py-3 px-4 text-sm font-semibold text-grey">Date</th>
               <th class="py-3 px-4 text-sm font-semibold text-grey">Statut</th>
               <th class="py-3 px-4 text-sm font-semibold text-grey text-right">Prix</th>
+              <th class="py-3 px-4 text-sm font-semibold text-grey text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -77,6 +80,26 @@
                 </span>
               </td>
               <td class="py-4 px-4 font-semibold text-white text-right">{{ res.price | number:'1.2-2' }} DT</td>
+              <td class="py-4 px-4 text-center">
+                <!-- Status Update Dropdown -->
+                <div class="flex flex-col items-center gap-2">
+                  <select 
+                    [value]="res.status" 
+                    (change)="onStatusChange(res.reservationId, $event)"
+                    class="bg-darkmode border border-dark_border rounded-md px-2 py-1 text-white text-sm">
+                    <option value="PENDING">En attente</option>
+                    <option value="CONFIRMED">Confirmé</option>
+                    <option value="CANCELLED">Annulé</option>
+                  </select>
+                  <button 
+                    (click)="openChat(res)" 
+                    class="bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded-lg text-sm transition duration-200 flex items-center justify-center mt-1"
+                    title="Envoyer un message au client">
+                    <span class="mr-1">💬</span>
+                    Message
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>

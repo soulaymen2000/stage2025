@@ -46,4 +46,8 @@ export class ServiceApiService {
   getPersonalizedRecommendations(): Observable<Service[]> {
     return this.http.get<Service[]>(`${this.baseUrl}/recommendations`);
   }
-} 
+
+  getCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/categories`);
+  }
+}

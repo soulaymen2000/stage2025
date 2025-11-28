@@ -3,6 +3,8 @@
   <div class="max-w-3xl mx-auto p-8 rounded-2xl shadow-2xl bg-[#23263b]">
     <h2 class="text-2xl font-bold text-primary mb-8 text-center">Gestion des Services</h2>
 
+   
+
     <form *ngIf="isFournisseur" [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <div>
         <label class="block text-white font-semibold mb-2">Titre</label>
@@ -10,7 +12,10 @@
       </div>
       <div>
         <label class="block text-white font-semibold mb-2">Catégorie</label>
-        <input type="text" formControlName="category" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+        <select formControlName="category" class="w-full rounded-md border border-dark_border bg-darkmode px-4 py-2 text-white focus:border-primary focus:outline-none">
+          <option value="" disabled selected>Sélectionner une catégorie</option>
+          <option *ngFor="let cat of categories" [value]="cat" class="text-white bg-darkmode">{{ cat }}</option>
+        </select>
       </div>
       <div class="md:col-span-2">
         <label class="block text-white font-semibold mb-2">Description</label>

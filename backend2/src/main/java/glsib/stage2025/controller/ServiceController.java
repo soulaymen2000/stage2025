@@ -1,6 +1,7 @@
 package glsib.stage2025.controller;
 
 import glsib.stage2025.model.Service;
+import glsib.stage2025.model.ServiceCategory;
 import glsib.stage2025.model.User;
 import glsib.stage2025.repository.ServiceRepository;
 import glsib.stage2025.repository.UserRepository;
@@ -58,7 +59,7 @@ public class ServiceController {
         }
         // Apply filters
         if (category != null && !category.isEmpty()) {
-            services = services.stream().filter(s -> category.equalsIgnoreCase(s.getCategory())).toList();
+            services = services.stream().filter(s -> s.getCategory() != null && category.equalsIgnoreCase(s.getCategory().name())).toList();
         }
         if (location != null && !location.isEmpty()) {
             services = services.stream().filter(s -> location.equalsIgnoreCase(s.getLocation())).toList();
@@ -100,7 +101,7 @@ public class ServiceController {
 
     private double similarityScore(Service a, Service b) {
         double score = 0;
-        if (a.getCategory() != null && a.getCategory().equalsIgnoreCase(b.getCategory())) score += 5;
+        if (a.getCategory() != null && a.getCategory() == b.getCategory()) score += 5;
         if (a.getLocation() != null && a.getLocation().equalsIgnoreCase(b.getLocation())) score += 2;
         if (Math.abs(a.getPrice() - b.getPrice()) < 20) score += 1;
         score += b.getRating(); // bonus for higher rating
@@ -130,7 +131,7 @@ public class ServiceController {
             java.util.Map<String, Object> serviceMap = new java.util.HashMap<>();
             serviceMap.put("id", s.getId());
             serviceMap.put("title", s.getTitle() != null ? s.getTitle() : "");
-            serviceMap.put("category", s.getCategory() != null ? s.getCategory() : "");
+            serviceMap.put("category", s.getCategory() != null ? s.getCategory().name() : "");
             serviceMap.put("brand", s.getBrand() != null ? s.getBrand() : "");
             serviceMap.put("price", s.getPrice());
             serviceMap.put("location", s.getLocation() != null ? s.getLocation() : "");
@@ -160,7 +161,7 @@ public class ServiceController {
             .toList();
         // ML empty: fallback to rule-based using history
         List<Service> reservedServices = serviceRepository.findAllById(reservedServiceIds);
-        List<String> preferredCategories = reservedServices.stream().map(Service::getCategory).distinct().toList();
+        List<ServiceCategory> preferredCategories = reservedServices.stream().map(Service::getCategory).distinct().toList();
         // Recommend services in preferred categories, not already reserved, sorted by rating
         List<Service> personalized = allServices.stream()
             .filter(s -> preferredCategories.contains(s.getCategory()) && !reservedServiceIds.contains(s.getId()))
@@ -215,5 +216,10 @@ public class ServiceController {
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<ServiceCategory[]> getCategories() {
+        return ResponseEntity.ok(ServiceCategory.values());
     }
 } 

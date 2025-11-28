@@ -34,6 +34,20 @@ Frontend (`frontend/client-app`):
 - Public endpoints: `GET /api/services/**`, `GET /api/services/recommendations` (others as configured)
 - Mutations on services require `FOURNISSEUR`
 
+## Messaging System
+
+The application includes two messaging systems:
+
+1. **Reservation-based Messaging** (Original):
+   - Messages are tied to specific reservations
+   - Accessible through reservation details
+   - Located at `/reservation/history`
+
+2. **Flexible Messaging** (New):
+   - Direct communication between users without reservations
+   - Accessible through the main messaging page at `/messaging`
+   - See `README_MESSAGING.md` for detailed documentation
+
 ## Code quality conventions
 
 - Constructor injection via Lombok `@RequiredArgsConstructor`

@@ -6,14 +6,16 @@ public class ReservationDetailDto {
     private Long reservationId;
     private String serviceName;
     private String clientName;
+    private Long clientId; // Add client ID for messaging
     private LocalDateTime reservationDate;
     private String status;
     private double price;
 
-    public ReservationDetailDto(Long reservationId, String serviceName, String clientName, LocalDateTime reservationDate, String status, double price) {
+    public ReservationDetailDto(Long reservationId, String serviceName, String clientName, Long clientId, LocalDateTime reservationDate, String status, double price) {
         this.reservationId = reservationId;
         this.serviceName = serviceName;
         this.clientName = clientName;
+        this.clientId = clientId;
         this.reservationDate = reservationDate;
         this.status = status;
         this.price = price;
@@ -42,6 +44,14 @@ public class ReservationDetailDto {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
     }
 
     public LocalDateTime getReservationDate() {

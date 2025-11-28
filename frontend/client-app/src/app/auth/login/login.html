@@ -27,6 +27,7 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-[22px]">
         <input
+          id="email"
           type="email"
           formControlName="email"
           placeholder="Email"
@@ -38,6 +39,7 @@
       </div>
       <div class="mb-[22px]">
         <input
+          id="password"
           type="password"
           formControlName="password"
           placeholder="Password"

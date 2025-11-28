@@ -29,7 +29,6 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Role is required")
     private Role role;
 
     // Added to align with recommendation dataset

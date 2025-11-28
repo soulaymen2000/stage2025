@@ -14,7 +14,6 @@ import { ReservationCreate, ReviewCreate } from '../../shared/api-models';
   styleUrls: ['./fournisseur-services2.scss'],
   standalone: false
 })
-
 export class FournisseurServices2Component implements OnInit {
   services: Array<Service> = [];
   serviceForm: FormGroup;
@@ -33,6 +32,7 @@ export class FournisseurServices2Component implements OnInit {
   successRating: { [serviceId: string]: boolean } = {};
   errorReservation: { [serviceId: string]: string } = {};
   errorRating: { [serviceId: string]: string } = {};
+  categories: string[] = [];
 
   constructor(
     private api: ServiceApiService,
@@ -54,6 +54,21 @@ export class FournisseurServices2Component implements OnInit {
   // ...existing code...
 
   ngOnInit() {
+    // Load categories
+    this.api.getCategories().subscribe({
+      next: (cats: string[]) => {
+        console.log('Categories loaded:', cats);
+        this.categories = cats;
+        // Add a small delay to ensure change detection
+        setTimeout(() => {
+          this.cdRef.detectChanges();
+        }, 0);
+      },
+      error: (err) => {
+        console.error('Error loading categories:', err);
+        this.snackBar.open('Erreur lors du chargement des catégories', 'Fermer', { duration: 3000 });
+      }
+    });
     // Detect role
     const token = localStorage.getItem('token');
     if (token) {

@@ -23,8 +23,15 @@ public class JwtService {
             .map(Object::toString)
             .orElse("CLIENT"); // fallback if no role
 
+        // Get user ID from CustomUserDetails
+        Long userId = null;
+        if (userPrincipal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) userPrincipal).getUserId();
+        }
+        
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
+                .claim("userId", userId)
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
