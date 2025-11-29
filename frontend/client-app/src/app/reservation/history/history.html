@@ -1,41 +1,184 @@
-<div class="reservation-history">
-  <h2>Mes Réservations</h2>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-12 px-4">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-12 text-center animate-fade-in-down">
+      <h2 class="text-5xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        Mes Réservations
+      </h2>
+      <p class="text-slate-600 text-lg font-medium">
+        <span class="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-md">
+          <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+          </svg>
+          <span class="font-bold text-indigo-600">{{ reservations.length }}</span>
+          réservation(s)
+        </span>
+      </p>
+    </div>
 
-  <p>Nombre de réservations: {{ reservations.length }}</p>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 animate-pulse">
+      <div class="w-20 h-20 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+      <p class="text-slate-600 text-xl font-semibold">Chargement de vos réservations...</p>
+    </div>
 
-  <div *ngIf="loading" class="loading">
-    <p>Chargement...</p>
-  </div>
+    <!-- No Reservations State -->
+    <div *ngIf="!loading && reservations.length === 0" class="text-center py-20 animate-fade-in">
+      <div class="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-8">
+        <svg class="w-16 h-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <h3 class="text-3xl font-bold text-slate-800 mb-3">Aucune réservation</h3>
+      <p class="text-slate-600 text-lg mb-8 max-w-md mx-auto">
+        Vous n'avez pas encore de réservations. Commencez à explorer nos services !
+      </p>
+      <button class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300">
+        Découvrir les services
+      </button>
+    </div>
 
-  <div *ngIf="!loading && reservations.length === 0" class="no-reservations">
-    <p>Aucune réservation trouvée.</p>
-  </div>
+    <!-- Reservations Grid -->
+    <div *ngIf="!loading && reservations.length > 0" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+      <div *ngFor="let reservation of reservations; let i = index"
+           class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 border border-slate-200"
+           [style.animation-delay]="(i * 0.1) + 's'">
+        <!-- Card Header with Gradient -->
+        <div class="h-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"></div>
 
-  <div *ngIf="!loading && reservations.length > 0" class="reservations-list">
-    <div *ngFor="let reservation of reservations" class="reservation-card">
-      <div class="reservation-info">
-        <h3>Réservation #{{ reservation.id }}</h3>
-        <p><strong>Service:</strong> {{ reservation.service?.title || 'N/A' }}</p>
-        <p><strong>Date:</strong> {{ reservation.reservationDate | date:'short' }}</p>
-        <button (click)="openChat(reservation)" class="chat-btn">
-          💬 Ouvrir la messagerie
-        </button>
+        <div class="p-6">
+          <!-- Reservation ID Badge -->
+          <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-bold">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+              </svg>
+              #{{ reservation.id }}
+            </span>
+            <span class="text-green-500">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Service Info -->
+          <div class="space-y-4 mb-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Service</p>
+                <p class="text-lg font-bold text-slate-900 truncate">{{ reservation.service?.title || 'N/A' }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Date de réservation</p>
+                <p class="text-base font-bold text-slate-900">{{ reservation.reservationDate | date:'medium' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Button -->
+          <button (click)="openChat(reservation)"
+                  class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group">
+            <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
+              <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
+            </svg>
+            <span>Ouvrir la messagerie</span>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Chat Modal -->
-  <div *ngIf="showChat && selectedReservation && selectedReservation.id && currentUserId && otherUserId" class="chat-modal">
-    <div class="chat-modal-content">
-      <div class="chat-header">
-        <h3>Messagerie - Réservation #{{ selectedReservation.id }}</h3>
-        <button (click)="closeChat()" class="close-btn">×</button>
+    <!-- Chat Modal -->
+    <div *ngIf="showChat && selectedReservation && selectedReservation.id && currentUserId && otherUserId"
+         class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+         (click)="closeChat()">
+      <div class="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 animate-scale-in"
+           (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
+                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-2xl font-black m-0">Messagerie</h3>
+              <p class="text-purple-100 text-sm font-medium">Réservation #{{ selectedReservation.id }}</p>
+            </div>
+          </div>
+          <button (click)="closeChat()"
+                  class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all duration-200 hover:rotate-90">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Chat Component -->
+        <app-chat
+          [reservationId]="selectedReservation.id!"
+          [currentUserId]="currentUserId"
+          [otherUserId]="otherUserId">
+        </app-chat>
       </div>
-      <app-chat 
-        [reservationId]="selectedReservation.id!"
-        [currentUserId]="currentUserId"
-        [otherUserId]="otherUserId">
-      </app-chat>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+</style>

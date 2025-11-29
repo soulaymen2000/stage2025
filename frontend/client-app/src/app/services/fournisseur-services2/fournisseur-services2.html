@@ -1,94 +1,280 @@
 <app-navbar></app-navbar>
-<div class="min-h-screen bg-darkmode py-10">
-  <div class="max-w-3xl mx-auto p-8 rounded-2xl shadow-2xl bg-[#23263b]">
-    <h2 class="text-2xl font-bold text-primary mb-8 text-center">Gestion des Services</h2>
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4 relative overflow-hidden">
+  <!-- Animated Background -->
+  <div class="absolute inset-0">
+    <div class="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -top-48 -right-48 animate-float"></div>
+    <div class="absolute w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl -bottom-48 -left-48 animate-float-delayed"></div>
+  </div>
 
-   
+  <div class="max-w-6xl mx-auto relative z-10">
+    <!-- Header -->
+    <div class="text-center mb-12 animate-fade-in-down">
+      <h2 class="text-5xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent mb-4">
+        Gestion des Services
+      </h2>
+      <p class="text-slate-300 text-lg font-medium">Créez et gérez vos services professionnels</p>
+    </div>
 
-    <form *ngIf="isFournisseur" [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div>
-        <label class="block text-white font-semibold mb-2">Titre</label>
-        <input type="text" formControlName="title" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
+    <!-- Service Form (Fournisseur Only) -->
+    <form *ngIf="isFournisseur" [formGroup]="serviceForm" (ngSubmit)="onSubmit()"
+          class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 mb-12 border border-white/20 shadow-2xl animate-fade-in-up">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Title -->
+        <div>
+          <label class="block text-white font-bold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+            </svg>
+            Titre du service
+          </label>
+          <input type="text" formControlName="title"
+                 class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-white placeholder:text-slate-400 focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300"
+                 placeholder="Ex: Développement web" />
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label class="block text-white font-bold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+            </svg>
+            Catégorie
+          </label>
+          <select formControlName="category"
+                  class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-white focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300">
+            <option value="" disabled selected class="bg-slate-800">Sélectionner une catégorie</option>
+            <option *ngFor="let cat of categories" [value]="cat" class="bg-slate-800">{{ cat }}</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="md:col-span-2">
+          <label class="block text-white font-bold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            Description
+          </label>
+          <textarea formControlName="description" rows="3"
+                    class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-white placeholder:text-slate-400 focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300"
+                    placeholder="Décrivez votre service en détail..."></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-white font-bold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+            </svg>
+            Prix (DT)
+          </label>
+          <input type="number" formControlName="price"
+                 class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-white placeholder:text-slate-400 focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300"
+                 placeholder="0.00" />
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label class="block text-white font-bold mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+            Localisation
+          </label>
+          <input type="text" formControlName="location"
+                 class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-5 py-3.5 text-white placeholder:text-slate-400 focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300"
+                 placeholder="Ex: Tunis, Tunisie" />
+        </div>
       </div>
-      <div>
-        <label class="block text-white font-semibold mb-2">Catégorie</label>
-        <select formControlName="category" class="w-full rounded-md border border-dark_border bg-darkmode px-4 py-2 text-white focus:border-primary focus:outline-none">
-          <option value="" disabled selected>Sélectionner une catégorie</option>
-          <option *ngFor="let cat of categories" [value]="cat" class="text-white bg-darkmode">{{ cat }}</option>
-        </select>
-      </div>
-      <div class="md:col-span-2">
-        <label class="block text-white font-semibold mb-2">Description</label>
-        <textarea formControlName="description" rows="2" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none"></textarea>
-      </div>
-      <div>
-        <label class="block text-white font-semibold mb-2">Prix</label>
-        <input type="number" formControlName="price" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
-      </div>
-      <div>
-        <label class="block text-white font-semibold mb-2">Localisation</label>
-        <input type="text" formControlName="location" class="w-full rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none" />
-      </div>
-      <div class="md:col-span-2 flex gap-4 justify-end mt-4">
-        <button type="submit" [disabled]="loading" class="bg-primary text-white font-semibold px-8 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
-          {{ editing ? 'Enregistrer' : 'Ajouter' }}
+
+      <!-- Form Actions -->
+      <div class="flex gap-4 justify-end mt-8">
+        <button type="submit" [disabled]="loading"
+                class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+          {{ editing ? 'Enregistrer' : 'Ajouter le service' }}
         </button>
-        <button *ngIf="editing" type="button" (click)="cancelEdit()" class="bg-transparent text-red-400 border border-red-400 px-8 py-2 rounded-lg hover:bg-red-400 hover:text-white transition">Annuler</button>
+        <button *ngIf="editing" type="button" (click)="cancelEdit()"
+                class="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl border-2 border-white/30 hover:bg-white/20 hover:border-white/50 hover:-translate-y-1 transition-all duration-300">
+          Annuler
+        </button>
       </div>
     </form>
 
-    <div *ngIf="loading" class="w-full flex justify-center mb-6">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex justify-center py-12">
+      <div class="w-16 h-16 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
     </div>
 
-    <div *ngIf="ready && services.length > 0" class="space-y-6">
-      <div *ngFor="let service of services" class="rounded-xl bg-[#23263b] border border-dark_border p-6 shadow-lg flex flex-col mb-8">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full mb-2">
-          <div class="text-left">
-            <h3 class="text-xl font-bold text-primary mb-2">{{ service.title }}</h3>
-            <p class="text-white mb-1"><span class="font-semibold text-grey">Description:</span> {{ service.description }}</p>
-            <p class="text-white mb-1"><span class="font-semibold text-grey">Catégorie:</span> {{ service.category }}</p>
-            <p class="text-white mb-1"><span class="font-semibold text-grey">Prix:</span> {{ service.price }} DT</p>
-            <p class="text-white"><span class="font-semibold text-grey">Localisation:</span> {{ service.location }}</p>
+    <!-- Services List -->
+    <div *ngIf="ready && services.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in">
+      <div *ngFor="let service of services; let i = index"
+           class="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-2xl transform hover:scale-[1.02] transition-all duration-300"
+           [style.animation-delay]="(i * 0.1) + 's'">
+        <!-- Gradient Top Bar -->
+        <div class="h-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"></div>
+
+        <div class="p-6">
+          <!-- Service Header -->
+          <div class="flex items-start justify-between mb-4">
+            <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+              <span class="w-10 h-10 bg-purple-500/30 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                </svg>
+              </span>
+              {{ service.title }}
+            </h3>
+            <span class="inline-flex items-center gap-2 bg-purple-500/30 px-3 py-1.5 rounded-full text-xs font-bold text-purple-200">
+              {{ service.category }}
+            </span>
           </div>
-          <div class="flex gap-4 mt-4 md:mt-0">
-            <button (click)="editService(service)" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Modifier</button>
-            <button (click)="deleteService(service.id)" class="bg-red-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition" *ngIf="isFournisseur">Supprimer</button>
-            <button *ngIf="isClient" (click)="reserve(service.id!)" [disabled]="loadingReservation[service.id!] || hasReserved(service.id!)" class="bg-green-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
+
+          <!-- Service Details -->
+          <div class="space-y-3 mb-6">
+            <p class="text-slate-300 leading-relaxed">{{ service.description }}</p>
+            <div class="flex items-center gap-2 text-white">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+              </svg>
+              <span class="font-bold text-xl">{{ service.price }} DT</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300">
+              <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+              </svg>
+              {{ service.location }}
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button *ngIf="isFournisseur" (click)="editService(service)"
+                    class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-indigo-500/50">
+              Modifier
+            </button>
+            <button *ngIf="isFournisseur" (click)="deleteService(service.id)"
+                    class="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-red-500/50">
+              Supprimer
+            </button>
+            <button *ngIf="isClient" (click)="reserve(service.id!)"
+                    [disabled]="loadingReservation[service.id!] || hasReserved(service.id!)"
+                    class="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
               <span *ngIf="!hasReserved(service.id!) && !loadingReservation[service.id!]">Réserver</span>
-              <span *ngIf="hasReserved(service.id!)">Réservé</span>
+              <span *ngIf="hasReserved(service.id!)">✓ Réservé</span>
               <span *ngIf="loadingReservation[service.id!]">...</span>
             </button>
           </div>
-        </div>
-        <div *ngIf="isClient" class="rounded-lg bg-[#23263b] border border-dark_border p-6 shadow-md w-full flex flex-col gap-4 mt-2">
-          <div *ngIf="successReservation[service.id!]" class="text-green-400 text-sm mt-1">Réservation effectuée !</div>
-          <div *ngIf="errorReservation[service.id!]" class="text-red-400 text-sm mt-1">{{ errorReservation[service.id!] }}</div>
-          <!-- Rating Stars -->
-          <div class="flex flex-col md:flex-row md:items-center gap-4 w-full">
-            <div class="flex items-center gap-2">
+
+          <!-- Rating Section (Client Only) -->
+          <div *ngIf="isClient" class="mt-6 pt-6 border-t border-white/10">
+            <div *ngIf="successReservation[service.id!]" class="text-green-400 text-sm mb-3 font-medium">✓ Réservation effectuée !</div>
+            <div *ngIf="errorReservation[service.id!]" class="text-red-400 text-sm mb-3 font-medium">{{ errorReservation[service.id!] }}</div>
+
+            <!-- Stars -->
+            <div class="flex items-center gap-2 mb-4">
               <ng-container *ngFor="let star of [1,2,3,4,5]">
-                <svg (click)="setRating(service.id!, star)" [ngClass]="{'cursor-pointer': true, 'text-yellow-400 fill-yellow-400': rating[service.id!] >= star, 'text-gray-400 fill-gray-400': rating[service.id!] < star}" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <svg (click)="setRating(service.id!, star)"
+                     [ngClass]="{'cursor-pointer': true, 'text-yellow-400 fill-yellow-400': rating[service.id!] >= star, 'text-slate-600 fill-slate-600': rating[service.id!] < star}"
+                     class="w-8 h-8 transition-all duration-200 hover:scale-110"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                 </svg>
               </ng-container>
-              <span class="ml-2 text-white text-sm" *ngIf="rating[service.id!]">{{ rating[service.id!] }}/5</span>
+              <span class="ml-2 text-white text-sm font-medium" *ngIf="rating[service.id!]">{{ rating[service.id!] }}/5</span>
             </div>
-            <!-- Optional Comment -->
-            <textarea [(ngModel)]="comment[service.id!]" placeholder="Laisser un commentaire (optionnel)" class="w-full mt-2 rounded-md border border-dark_border bg-transparent px-4 py-2 text-white placeholder:text-grey focus:border-primary focus:outline-none text-sm"></textarea>
-            <button (click)="submitRating(service.id!)" [disabled]="!rating[service.id!] || loadingRating[service.id!]" class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition">
-              <span *ngIf="!loadingRating[service.id!]">Noter</span>
+
+            <!-- Comment -->
+            <textarea [(ngModel)]="comment[service.id!]"
+                      placeholder="Laisser un commentaire (optionnel)"
+                      class="w-full rounded-xl border-2 border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 focus:border-purple-400 focus:bg-white/10 focus:ring-4 focus:ring-purple-400/20 transition-all duration-300 text-sm mb-3"></textarea>
+
+            <button (click)="submitRating(service.id!)"
+                    [disabled]="!rating[service.id!] || loadingRating[service.id!]"
+                    class="w-full py-3 bg-yellow-500 text-white font-bold rounded-xl hover:bg-yellow-600 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-yellow-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+              <span *ngIf="!loadingRating[service.id!]">⭐ Noter ce service</span>
               <span *ngIf="loadingRating[service.id!]">...</span>
             </button>
-            <div *ngIf="successRating[service.id!]" class="text-green-400 text-sm mt-1">Merci pour votre note !</div>
-            <div *ngIf="errorRating[service.id!]" class="text-red-400 text-sm mt-1">{{ errorRating[service.id!] }}</div>
+
+            <div *ngIf="successRating[service.id!]" class="text-green-400 text-sm mt-3 font-medium">✓ Merci pour votre note !</div>
+            <div *ngIf="errorRating[service.id!]" class="text-red-400 text-sm mt-3 font-medium">{{ errorRating[service.id!] }}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div *ngIf="ready && services.length === 0" class="text-center text-grey mt-8">
-      <p>Aucun service disponible.</p>
+    <!-- No Services -->
+    <div *ngIf="ready && services.length === 0" class="text-center py-20 animate-fade-in">
+      <div class="inline-flex items-center justify-center w-32 h-32 bg-white/10 backdrop-blur-xl rounded-full mb-8 border border-white/20">
+        <svg class="w-16 h-16 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+        </svg>
+      </div>
+      <h3 class="text-3xl font-bold text-white mb-3">Aucun service disponible</h3>
+      <p class="text-slate-300 text-lg">Commencez par créer votre premier service !</p>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-40px) scale(1.08); }
+  }
+
+  @keyframes fade-in-down {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out 0.2s both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+</style>
